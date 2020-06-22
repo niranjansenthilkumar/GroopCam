@@ -264,15 +264,11 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         })    }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-
-        
         let groupRollVC = GroupRollController(collectionViewLayout: UICollectionViewFlowLayout())
         groupRollVC.group = self.groups[indexPath.row]
-        
-//        cameraController.username = self.username
         groupRollVC.username = self.username
-        
         groupRollVC.groupCount = self.groups[indexPath.row].members.count
+        
         self.navigationController?.pushNavBarWithTitle(vc: groupRollVC)
         
         self.navigationItem.leftItemsSupplementBackButton = true

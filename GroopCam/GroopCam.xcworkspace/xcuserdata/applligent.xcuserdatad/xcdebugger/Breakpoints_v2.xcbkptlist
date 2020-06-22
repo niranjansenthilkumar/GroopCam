@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "D4200542-09E3-4F2A-ADCC-6C945FAF036B"
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "34538C86-746B-429E-AF3E-3A66AE58C341"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GroopCam/GroupRoll/GroupRollController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "603"
+            endingLineNumber = "603"
+            landmarkName = "unknown"
+            landmarkType = "0">
+            <Locations>
+               <Location
+                  uuid = "34538C86-746B-429E-AF3E-3A66AE58C341 - 4c8599f8e0d3b344"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #4 (Swift.Array&lt;__C.PHAsset&gt;) -&gt; () in GroopCam.GroupRollController.openGallery() -&gt; ()"
+                  moduleName = "GroopCam"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/applligent/Documents/Projects/GroopCam/GroopCam/GroopCam/GroopCam/GroupRoll/GroupRollController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "593"
+                  endingLineNumber = "593"
+                  offsetFromSymbolStart = "1623">
+               </Location>
+               <Location
+                  uuid = "34538C86-746B-429E-AF3E-3A66AE58C341 - 12a578e7715420bd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;__C.UIImage&gt;, Swift.Optional&lt;Swift.Dictionary&lt;Swift.AnyHashable, Any&gt;&gt;) -&gt; () in closure #4 (Swift.Array&lt;__C.PHAsset&gt;) -&gt; () in GroopCam.GroupRollController.openGallery() -&gt; ()"
+                  moduleName = "GroopCam"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/applligent/Documents/Projects/GroopCam/GroopCam/GroopCam/GroopCam/GroupRoll/GroupRollController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "596"
+                  endingLineNumber = "596"
+                  offsetFromSymbolStart = "250">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C4D7EA29-D48F-4656-B0A0-B429C4B031C9"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GroopCam/GroupRoll/GroupRollController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "145"
+            endingLineNumber = "145"
+            landmarkName = "unknown"
+            landmarkType = "0">
+            <Locations>
+               <Location
+                  uuid = "C4D7EA29-D48F-4656-B0A0-B429C4B031C9 - fbfda89164392361"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__C.FIRDataSnapshot) -&gt; () in GroopCam.GroupRollController.(fetchPostsWithGroupID in _24F6704905723ECA90511FA0617121A3)(groupID: Swift.String, isInitialLoad: Swift.Bool) -&gt; ()"
+                  moduleName = "GroopCam"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/applligent/Documents/Projects/GroopCam/GroopCam/GroopCam/GroopCam/GroupRoll/GroupRollController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "139"
+                  endingLineNumber = "139"
+                  offsetFromSymbolStart = "508">
+               </Location>
+               <Location
+                  uuid = "C4D7EA29-D48F-4656-B0A0-B429C4B031C9 - 2de35b47fc281b37"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.String, Any) -&gt; () in closure #1 (__C.FIRDataSnapshot) -&gt; () in GroopCam.GroupRollController.(fetchPostsWithGroupID in _24F6704905723ECA90511FA0617121A3)(groupID: Swift.String, isInitialLoad: Swift.Bool) -&gt; ()"
+                  moduleName = "GroopCam"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/applligent/Documents/Projects/GroopCam/GroopCam/GroopCam/GroopCam/GroupRoll/GroupRollController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "140"
+                  endingLineNumber = "140"
+                  offsetFromSymbolStart = "368">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "54E91447-BD6A-413B-80C6-B1BDB7B33CFE"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GroopCam/GroupRoll/GroupRollController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

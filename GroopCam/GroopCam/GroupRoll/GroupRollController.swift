@@ -9,12 +9,18 @@
 import UIKit
 import FirebaseDatabase
 import Kingfisher
+import BSImagePicker
+import Photos
+import FirebaseAuth
+import FirebaseDatabase
+import FirebaseStorage
 
 class GroupRollController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    var username: String = ""
     var group: Group?
     var groupCount: Int = 0
-    
+
     var objects : [PrintableObject] = []
     
     var isSelected: Bool = false
@@ -46,6 +52,15 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         return button
     }()
     
+        
+    var activityIndicator: UIActivityIndicatorView?
+    var arrImages = [UIImage]()
+    var assetCount = 0
+    var initialPostsCount = 0
+    typealias FileCompletionBlock = () -> Void
+    var block: FileCompletionBlock?
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -63,18 +78,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         
         guard let groupId = self.group?.groupid else {return}
         
-        
-//        cell.groopImage.loadImage(urlString: post.imageUrl)
-//
-//        for post in self.posts{
-//            let cv = CustomImageView()
-//            cv.loadImage(urlString: post.imageUrl)
-//            guard let image = cv.image else {return}
-//
-//            self.objects.append(PrintableObject(isSelectedByUser: false, post: post, image: image))
-//        }
         self.showSpinner(onView: self.collectionView)
-
         fetchPostsWithGroupID(groupID: groupId)
         
         
@@ -86,6 +90,11 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
             self.friendButton.setTitle(String(groupCount) + " friends 👥", for: .normal)
         }
         
+        
+        activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
+        activityIndicator!.center = self.collectionView.center
+        self.collectionView.addSubview(activityIndicator!)
+
     }
     
     @objc func handleUpdateFeed() {
@@ -106,28 +115,40 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
             self.collectionView.reloadData()
             return
         }
-        
     }
     
-    var posts = [Picture]()
-    fileprivate func fetchPostsWithGroupID(groupID: String) {
+    func getAllPosts() {
+        //showActivityIndicator()
+        print("getAllPosts() called")
+        guard let groupId = self.group?.groupid else {return}
+        self.posts.removeAll()
+        self.objects.removeAll()
         
+        fetchPostsWithGroupID(groupID: groupId, isInitialLoad: false)
+    }
+    
+    
+    var posts = [Picture]()
+    
+    fileprivate func fetchPostsWithGroupID(groupID: String, isInitialLoad: Bool = true) {
         Database.database().reference().child("posts").child(groupID).observeSingleEvent(of: .value) { (snapshot) in
             
             guard let dictionaries = snapshot.value as? [String: Any] else {
                 self.removeSpinner()
                 return }
-
             
+            if isInitialLoad {
+                self.initialPostsCount = dictionaries.count
+            }
+            
+            print("Dictionary count is: \(dictionaries.count)")
             dictionaries.forEach { (key, value) in
                 guard let dictionary = value as? [String : Any] else {return}
                 
                 print(key, value)
                 
                 let userIDToAdd = dictionary["userid"] as? String ?? ""
-                
-                print(userIDToAdd, "please")
-                
+                                
                 let creationDateToAdd = dictionary["creationDate"] as? String? ?? ""
                 
                 guard let groupName = dictionary["groupname"] else {return}
@@ -139,8 +160,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                 Database.database().reference().child("users").child(userIDToAdd).observeSingleEvent(of: .value) { (usersnapshot) in
                     
                     guard let userDictionary = usersnapshot.value as? [String: Any] else { return }
-
-                    print(userDictionary, "please")
                     
                     let usernameToAdd = userDictionary["username"] as? String ?? ""
                     
@@ -154,10 +173,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                     let creationDateFormat = self.parseDuration(creationDateToAdd ?? "")
                                         
                     let post = Picture(user: userToAdd, imageUrl: imageURLToAdd, creationDate: creationDateFormat, groupName: groupNameToAdd, isDeveloped: false, isSelectedByUser: false, picID: key)
-                    
-//                    let cimageView = CustomImageView()
-//                    cimageView.loadImage(urlString: imageURLToAdd)
-                    
+                                        
                     
                     self.posts.append(post)
                     
@@ -174,17 +190,22 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                         let c2 = Date(timeIntervalSince1970: p2.post.creationDate)
                         return c1.compare(c2) == .orderedDescending
                     }
-                    self.collectionView.reloadData()
-                    self.collectionView?.refreshControl?.endRefreshing()
-                    print("Success")
                     
+                    self.collectionView.reloadData()
+                    //self.collectionView?.refreshControl?.endRefreshing()
+                    print("Success")
                     self.removeSpinner()
-
+                    
+                    print("Posts count is: \(self.posts.count)")
+                    
+                    if self.posts.count == self.initialPostsCount + self.assetCount {
+                        print("All posts have been fetched")
+                        self.initialPostsCount = self.posts.count
+                        self.hideActivityIndicator()
+                    }
                 }
-                
             }
         }
-        
     }
     
     func parseDuration(_ timeString:String) -> TimeInterval {
@@ -202,9 +223,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         return interval
     }
 
-    var username: String = ""
-    
-    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupRollCell
@@ -234,8 +252,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-
-        
         let post = self.posts[indexPath.row]
 
         if isSelected{
@@ -305,8 +321,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
     }
     
     override func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-
-        
         if isSelected{
             if let cell = collectionView.cellForItem(at: indexPath) as? GroupRollCell {
                 
@@ -348,6 +362,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                 boolCount += 1
             }
         }
+        
         if boolCount == 0 {
             UIView.transition(with: view, duration: 0.2, options: .transitionCrossDissolve, animations: {
                 self.actualPrintButton.isEnabled = false
@@ -357,7 +372,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
     }
         
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
         if (self.posts.count == 0) {
             self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
         } else {
@@ -446,7 +460,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         self.navigationItem.leftBarButtonItem = nil
         self.navigationItem.backBarButtonItem = nil
 
-        self.navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(self.handleCamera)), animated: false)
+        //self.navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(self.handleCamera)), animated: false)
 
         self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "backbutton"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(self.handleBack))
 
@@ -560,6 +574,59 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
     }
     
     
+    @objc func openGallery() {
+        let imagePicker = ImagePickerController()
+        
+        presentImagePicker(imagePicker, select: { (asset) in
+            // User selected an asset. Do something with it. Perhaps begin processing/upload?
+            print("User selected an asset")
+        }, deselect: { (asset) in
+            // User deselected an asset. Cancel whatever you did when asset was selected.
+            print("User DeSelected an asset")
+        }, cancel: { (assets) in
+            // User canceled selection.
+        }, finish: { (assets) in
+            // User finished selection assets.
+            print("User finished selecting assets")
+            
+            //Upload all the images on firebase storage
+            print("Number of assets: \(assets.count)")
+            self.showActivityIndicator()
+            for asset in assets {
+                self.assetCount = assets.count
+                print("Asset is: \(asset)")
+                // Request the maximum size. If you only need a smaller size make sure to request that instead.
+                //self.showActivityIndicator()
+                PHImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .default, options: nil) { (image, info) in
+                    // Do something with image
+
+                    guard let dictInfo = info as? [String:Any] else {
+                        return
+                    }
+                    
+                    guard let isDegraded = dictInfo["PHImageResultIsDegradedKey"] as? Bool else {
+                        return
+                    }
+                                        
+                    guard !isDegraded else {
+                        return
+                    }
+                    
+                    guard let fetchedImage = image else {
+                        return
+                    }
+                    
+                    
+                    print("isDegraded is: \(isDegraded)")
+                    let fixedImage = fetchedImage.fixOrientation()
+                    self.applyFormatingOnImageAndAddToArray(prev: fixedImage)
+                }
+            }
+            
+            
+        })
+    }
+    
     func layoutViews(){
         
         collectionView.backgroundColor = Theme.backgroundColor
@@ -589,10 +656,14 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         guard let groupTitle = self.group?.groupname else {return}
         self.navigationItem.title = groupTitle
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleCamera))
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleCamera))
 
+        let cameraButton = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleCamera))
+        
+        let galleryButton = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(openGallery))
+
+        self.navigationItem.setRightBarButtonItems([cameraButton,galleryButton], animated: true)
     }
-
 }
 
 extension UIViewController {
@@ -657,12 +728,12 @@ extension UIViewController {
         let ai = UIActivityIndicatorView.init(style: .whiteLarge)
         ai.startAnimating()
         ai.center = spinnerView.center
-        
+
         DispatchQueue.main.async {
             spinnerView.addSubview(ai)
             onView.addSubview(spinnerView)
         }
-        
+
         vSpinner = spinnerView
     }
     
@@ -673,3 +744,141 @@ extension UIViewController {
         }
     }
 }
+
+extension GroupRollController {
+    func applyFormatingOnImageAndAddToArray(prev: UIImage) {
+        //var prev = UIImage()
+        
+        guard let cgimage = prev.cgImage else {return}
+        let originalCIImage = CIImage(cgImage: cgimage, options: [.applyOrientationProperty:true])
+        //        guard let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.8) else {return}
+        let sepiaCIImage = originalCIImage
+        
+        var previewImage = UIImage()
+        previewImage = UIImage(ciImage: sepiaCIImage)
+        
+        let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
+        containerView.backgroundColor = .white
+        
+        let groopImage = UIImageView()
+        containerView.addSubview(groopImage)
+        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
+        groopImage.contentMode = .scaleAspectFill
+        groopImage.clipsToBounds = true
+        groopImage.backgroundColor = .clear
+        groopImage.image = previewImage
+        groopImage.layer.borderColor = UIColor.black.cgColor
+        groopImage.layer.borderWidth = 2
+                
+        let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
+        groopCamLabel.sizeToFit()
+        containerView.addSubview(groopCamLabel)
+        groopCamLabel.anchor(top: groopImage.bottomAnchor, left: nil, bottom: nil, right: groopImage.rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: 0, paddingRight: 1, width: 200, height: 20)
+        groopCamLabel.setCharacterSpacing(-0.4)
+        
+        containerView.layer.masksToBounds = false
+        containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+        
+        guard let image = imageWithView(view: containerView) else {return}
+        
+        arrImages.append(image)
+        
+        if arrImages.count == assetCount {
+            print("Image array count is: \(arrImages.count)")
+            startUploading {
+                print("start uploading")
+            }
+        }
+    }
+    
+    func imageWithView(view: UIView) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
+        defer { UIGraphicsEndImageContext() }
+        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
+
+    func startUploading(completion: @escaping FileCompletionBlock) {
+         if arrImages.count == 0 {
+            completion()
+            return;
+         }
+
+         block = completion
+         uploadImage(forIndex: 0)
+        //showActivityIndicator()
+    }
+
+    func uploadImage(forIndex index:Int) {
+        if index < arrImages.count {
+            /// Perform uploading
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            guard let groupId = self.group?.groupid else {return}
+            
+            guard let groupName = self.group?.groupname else {return}
+            
+            let image = arrImages[index]
+            
+            guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
+            
+            let picId = NSUUID().uuidString
+            
+            Storage.storage().reference().child("posts").child(picId).putData(uploadData, metadata: nil) { (metadata, err) in
+                FirFile.shared.upload(data: uploadData, withName: picId, block: { (url) in
+                    /// After successfully uploading call this method again by increment the **index = index + 1**
+                    print(url ?? "Couldn't not upload. You can either check the error or just skip this.")
+                    
+                    if let strUrl = url {
+                        self.saveToDatabaseWithImageUrl(imageUrl: strUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId)
+                    }
+                    
+                    self.uploadImage(forIndex: index + 1)
+                })
+                return;
+            }
+            
+            if block != nil {
+                block!()
+            }
+        }
+        else {
+            print("No Images remaining to be uploaded")
+            arrImages.removeAll()
+        }
+    }
+    
+    func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String) {
+        let postImage = image
+                
+        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID] as [String : Any]
+        
+        let picValues = [picId: values]
+        
+        Database.database().reference().child("posts").child(groupID).updateChildValues(picValues) { (err, ref) in
+            if let err = err {
+                print("Failed to save image to DB", err)
+                return
+            }
+            
+            print("Successfully saved post to DB")
+            
+            self.getAllPosts()
+        }
+    Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
+    }
+    
+    func showActivityIndicator() {
+//        activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
+//        activityIndicator!.center = self.collectionView.center
+//        self.collectionView.addSubview(activityIndicator!)
+        activityIndicator!.startAnimating()
+    }
+    
+    func hideActivityIndicator() {
+        activityIndicator!.stopAnimating()
+//        activityIndicator?.removeFromSuperview()
+//        activityIndicator = nil
+    }
+}
+

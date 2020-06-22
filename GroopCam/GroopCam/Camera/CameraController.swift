@@ -179,8 +179,10 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
 
         var previewImage = UIImage()
         previewImage = UIImage(ciImage: sepiaCIImage)
+        
         let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
         containerView.backgroundColor = .white
+        
         let groopImage = UIImageView()
         containerView.addSubview(groopImage)
         groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
@@ -195,35 +197,6 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             groopImage.transform = CGAffineTransform(scaleX: -1, y: 1)
         }
         
-//        let groupLabel = UILabel().setupLabel(ofSize: 16, weight: UIFont.Weight.regular, textColor: .black, text: "slope day bb", textAlignment: .center)
-//        groupLabel.sizeToFit()
-//        containerView.addSubview(groupLabel)
-//        groupLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 7, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 20)
-//        groupLabel.text = group?.groupname ?? ""
-//
-//        let dateLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: .black, text: "04/01/20", textAlignment: .left)
-//        dateLabel.sizeToFit()
-//        containerView.addSubview(dateLabel)
-//        dateLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: 0, paddingBottom: -1, paddingRight: 0, width: 0, height: 20)
-//        let date = Date(timeIntervalSince1970: Date().timeIntervalSince1970)
-        
-//        dateLabel.text = Date(timeIntervalSince1970: Date().timeIntervalSince1970).asString(style: .short)
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//        let dateString = dateFormatter.string(from: date)
-//        
-//        dateLabel.text = dateString
-//        dateLabel.setCharacterSpacing(-0.4)
-
-
-        
-//        dateLabel.text = Date(timeIntervalSince1970: Date().timeIntervalSince1970).asString(style: .long)
-//
-//        let usernameLabel = UILabel().setupLabel(ofSize: 16, weight: UIFont.Weight.regular, textColor: .black, text: "slope day bb", textAlignment: .center)
-//        usernameLabel.sizeToFit()
-//        containerView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 20)
-//        usernameLabel.text = "taken by: " + username
         
         let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
         groopCamLabel.sizeToFit()
@@ -234,32 +207,8 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         containerView.layer.masksToBounds = false
         containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
 
-//        containerView.groopImage.contentMode = .scaleAspectFill
-//        containerView.groopImage.clipsToBounds = true
-//        containerView.groopImage.image = previewImage
-//        containerView.groupNameLabel.text = group?.groupname ?? ""
-//        containerView.usernameLabel.text = "taken by " + username
-//        containerView.dateLabel.text = Date(timeIntervalSince1970: Date().timeIntervalSince1970).asString(style: .long)
-        
-//        let iv = UIImageView(image: containerView.image)
-                        
-//        view.addSubview(containerView.photoImageView.asim)
-//        let image = containerView.getImage()
-        
-//        let iv = UIImageView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
-//        iv.image = containerView.asImage()
-//        view.addSubview(containerView)
-        
-//        let v = UIImageView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
-//        v.image = imageWithView(view: containerView)
-//            //        view.addSubview(UIImageView(image: containerView.asImage()))
-//        view.addSubview(v)
-        
-//        view.addSubview(containerView)
         
         guard let image = imageWithView(view: containerView) else {return}
-        
-//        handleSave(image: previewImage)
         handleSave(image: image)
         
     }
@@ -293,9 +242,6 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         print(256, "please")
         
-        
-
-        
         guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
         
         let picId = NSUUID().uuidString
@@ -320,7 +266,6 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
                 
                 self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId)
                 
-                
             }
         }
     }
@@ -334,7 +279,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         let picValues = [picId: values]
         
-    Database.database().reference().child("posts").child(groupID).updateChildValues(picValues) { (err, ref) in
+        Database.database().reference().child("posts").child(groupID).updateChildValues(picValues) { (err, ref) in
             if let err = err {
                 print("Failed to save image to DB", err)
                 return
@@ -343,10 +288,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             print("Successfully saved to post to DB")
         
         }
-        
-        
-        
-        Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
+    Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
     
     }
     
