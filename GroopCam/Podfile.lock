@@ -101,6 +101,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PromisesObjC (1.2.8)
+  - QuiltView (0.1.4)
   - Stripe/ApplePay (7.0.1):
     - Stripe/Core
   - Stripe/Core (7.0.1)
@@ -114,6 +115,7 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Storage
   - Kingfisher (~> 5.0)
+  - QuiltView
   - Stripe/ApplePay
 
 SPEC REPOS:
@@ -140,6 +142,7 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - QuiltView
     - Stripe
 
 SPEC CHECKSUMS:
@@ -165,8 +168,9 @@ SPEC CHECKSUMS:
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
+  QuiltView: 991e9710b432946b04bcd5721ee4b14175fa0292
   Stripe: b92298b31cf156fb23a029361b57e2fcb6583d57
 
-PODFILE CHECKSUM: e7245859a00a37078122ade9fa196ef862022e1c
+PODFILE CHECKSUM: eff89bf7feef241ef86b9a56e8a8c82a2345c0b7
 
 COCOAPODS: 1.8.4

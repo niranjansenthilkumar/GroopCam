@@ -14,8 +14,7 @@ import Photos
 import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
-
-class GroupRollController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class GroupRollController: UICollectionViewController {
     
     var username: String = ""
     var group: Group?
@@ -59,6 +58,10 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
     var initialPostsCount = 0
     typealias FileCompletionBlock = () -> Void
     var block: FileCompletionBlock?
+    var num = 0
+    var numberWidths = [Int]()
+    var numberHeights = [Int]()
+
 
     
     override func viewDidLoad() {
@@ -94,8 +97,21 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
         activityIndicator!.center = self.collectionView.center
         self.collectionView.addSubview(activityIndicator!)
-
+    
+//        let layout = QuiltView()
+//        // Set the layout to .horizontal if you want to scroll horizontally.
+//        // This setting is optional as the default is Vertical
+//
+//        // This sets the block or cell size. When the sizes are equal squares will be created.
+//        // When the sizes are different, rectangular cells will be created. The default size
+//        // set by the library is 314 x 314.
+//        layout.itemBlockSize   = CGSize(
+//           width: 75,
+//          height: 75
+//        )
+//        collectionView.collectionViewLayout = layout
     }
+    
     
     @objc func handleUpdateFeed() {
         handleRefresh()
@@ -108,7 +124,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         self.posts.removeAll()
         self.objects.removeAll()
         fetchPostsWithGroupID(groupID: groupId)
-        
         
         if self.posts.count == 0 && self.objects.count == 0 {
             self.removeSpinner()
@@ -147,6 +162,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                 
                 print(key, value)
                 
+                
                 let userIDToAdd = dictionary["userid"] as? String ?? ""
                                 
                 let creationDateToAdd = dictionary["creationDate"] as? String? ?? ""
@@ -155,6 +171,9 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                 let groupNameToAdd = groupName as? String ?? ""
                 
                 guard let imageURL = dictionary["imageUrl"] else {return}
+                
+                guard let imageWidth = dictionary["imageWidth"] as? Double else {return}
+                guard let imageHeight = dictionary["imageHeight"] as? Double else {return}
                 let imageURLToAdd = imageURL as? String ?? ""
                 
                 Database.database().reference().child("users").child(userIDToAdd).observeSingleEvent(of: .value) { (usersnapshot) in
@@ -172,7 +191,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                     
                     let creationDateFormat = self.parseDuration(creationDateToAdd ?? "")
                                         
-                    let post = Picture(user: userToAdd, imageUrl: imageURLToAdd, creationDate: creationDateFormat, groupName: groupNameToAdd, isDeveloped: false, isSelectedByUser: false, picID: key)
+                    let post = Picture(user: userToAdd, imageUrl: imageURLToAdd, creationDate: creationDateFormat, groupName: groupNameToAdd, isDeveloped: false, isSelectedByUser: false, picID: key, imageWidth: imageWidth, imageHeight: imageHeight)
                                         
                     
                     self.posts.append(post)
@@ -233,18 +252,9 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         
         cell.post = pic.post
 
-//        let floatdegrees = Int.random(in: -5...5)
-//        cell.rotateImage(degrees: 0)
-//
-//        cell.groupNameLabel.text = pic.post.groupName
-//        cell.usernameLabel.text = "taken by: " + pic.post.user.username
-//        cell.dateLabel.text = Date(timeIntervalSince1970: pic.post.creationDate).asString(style: .long)
-        
-//        cell.groopImage.loadImage(urlString: post.imageUrl)
         let url = URL(string: pic.post.imageUrl)
         cell.photoImageView.kf.setImage(with: url)
-
-//        cell.groopImage.kf.setImage(with: url)
+        cell.photoImageView.contentMode = .scaleAspectFit
 
         cell.configureCell(isSelectedByUser: objects[indexPath.row].isSelectedByUser)
                 
@@ -381,27 +391,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         return self.posts.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 23
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 40
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 19, left: 14, bottom: 19, right: 14)
-    }
-
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let width = (view.frame.width - 2) / 3
-
-        return CGSize(width: width - 25, height: width*1.561 - 40)
-    //1.504
-    }
-    
         
     @objc func handlePrintPhotos(){
         
@@ -480,7 +469,6 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
 
         
         self.collectionView.reloadData()
-        
         self.actualPrintButton.isEnabled = false
         self.actualPrintButton.alpha = 0.75
 
@@ -620,6 +608,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
                     print("isDegraded is: \(isDegraded)")
                     let fixedImage = fetchedImage.fixOrientation()
                     self.applyFormatingOnImageAndAddToArray(prev: fixedImage)
+                    //self.getFormattedImageAndAddToArray(prev: fixedImage)
                 }
             }
             
@@ -660,7 +649,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
 
         let cameraButton = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleCamera))
         
-        let galleryButton = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(openGallery))
+        let galleryButton = UIBarButtonItem(image: UIImage(named: "galleryIcon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(openGallery))
 
         self.navigationItem.setRightBarButtonItems([cameraButton,galleryButton], animated: true)
     }
@@ -762,13 +751,17 @@ extension GroupRollController {
         
         let groopImage = UIImageView()
         containerView.addSubview(groopImage)
-        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
+       
+//        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
+        
+        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
+
         groopImage.contentMode = .scaleAspectFill
         groopImage.clipsToBounds = true
         groopImage.backgroundColor = .clear
         groopImage.image = previewImage
-        groopImage.layer.borderColor = UIColor.black.cgColor
-        groopImage.layer.borderWidth = 2
+//        groopImage.layer.borderColor = UIColor.black.cgColor
+//        groopImage.layer.borderWidth = 2
                 
         let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
         groopCamLabel.sizeToFit()
@@ -779,6 +772,7 @@ extension GroupRollController {
         containerView.layer.masksToBounds = false
         containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
         
+        //This is where the image size changes from it's original size. Need to handle this thing.
         guard let image = imageWithView(view: containerView) else {return}
         
         arrImages.append(image)
@@ -798,6 +792,27 @@ extension GroupRollController {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 
+    //Test - Zubair
+    func getFormattedImageAndAddToArray(prev: UIImage) {
+        //var prev = UIImage()
+        let imageView = UIImageView(image: prev)
+    
+        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+
+        //This is where the image size changes from it's original size. Need to handle this thing.
+        arrImages.append(imageView.image!)
+        
+        if arrImages.count == assetCount {
+            print("Image array count is: \(arrImages.count)")
+            startUploading {
+                print("start uploading")
+            }
+        }
+    }
+    
+    //**********//
+    
+    
     func startUploading(completion: @escaping FileCompletionBlock) {
          if arrImages.count == 0 {
             completion()
@@ -882,3 +897,50 @@ extension GroupRollController {
     }
 }
 
+//extension GroupRollController : QuiltViewDelegate {
+//  func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, blockSizeForItemAtIndexPath indexPath: IndexPath) -> CGSize {
+//
+//        let remainder = indexPath.row % 2
+//        if remainder == 0 {
+//            //return CGSize(width: 1, height: 2)
+//        }
+//        return CGSize(width: 2, height: 2)
+//  }
+//
+//  // Set the spacing between the cells
+//  func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetsForItemAtIndexPath indexPath: IndexPath) -> UIEdgeInsets {
+//    return UIEdgeInsets(top: 100, left: 2, bottom: 2, right: 10)
+//    //return UIEdgeInsets(top: 19, left: 14, bottom: 19, right: 14)
+//  }
+//
+//}
+ 
+
+
+extension GroupRollController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 23
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 40
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 19, left: 14, bottom: 19, right: 14)
+    }
+
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let pic = self.objects[indexPath.row]
+        
+        print("Image size is: \(pic.post.imageWidth) X \(pic.post.imageHeight)")
+        print("Image URL is: \(pic.post.imageUrl)\n")
+
+        let width = (view.frame.width - 2) / 3
+        let height = CGFloat(pic.post.imageHeight)
+        return CGSize(width: width - 25, height: width*1.561 - 40)
+        
+       // return CGSize(width: width - 25, height: height)
+    }
+}
