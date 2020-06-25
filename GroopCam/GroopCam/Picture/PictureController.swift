@@ -81,20 +81,6 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
 
         photoImageView.layer.shouldRasterize = false
 
-//        photoImageView.addSubview(groopImage)
-//        groopImage.anchor(top: photoImageView.topAnchor, left: photoImageView.leftAnchor, bottom: photoImageView.bottomAnchor, right: photoImageView.rightAnchor, paddingTop: 32, paddingLeft: 20, paddingBottom: 72, paddingRight: 20, width: 0, height: 0)
-//
-//        photoImageView.addSubview(groupNameLabel)
-//        groupNameLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(dateLabel)
-//        dateLabel.anchor(top: groupNameLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(groopCamLabel)
-//        groopCamLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: -1, paddingBottom: 4, paddingRight: 0, width: 300, height: 16)
 
     }
     

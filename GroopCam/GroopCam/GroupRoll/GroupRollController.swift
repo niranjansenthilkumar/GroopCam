@@ -58,11 +58,6 @@ class GroupRollController: UICollectionViewController {
     var initialPostsCount = 0
     typealias FileCompletionBlock = () -> Void
     var block: FileCompletionBlock?
-    var num = 0
-    var numberWidths = [Int]()
-    var numberHeights = [Int]()
-
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,21 +93,11 @@ class GroupRollController: UICollectionViewController {
         activityIndicator!.center = self.collectionView.center
         self.collectionView.addSubview(activityIndicator!)
     
-//        let layout = QuiltView()
-//        // Set the layout to .horizontal if you want to scroll horizontally.
-//        // This setting is optional as the default is Vertical
-//
-//        // This sets the block or cell size. When the sizes are equal squares will be created.
-//        // When the sizes are different, rectangular cells will be created. The default size
-//        // set by the library is 314 x 314.
-//        layout.itemBlockSize   = CGSize(
-//           width: 75,
-//          height: 75
-//        )
-//        collectionView.collectionViewLayout = layout
+
+        //Custom layout
+        let customLayout = CustomLayout()
+        collectionView.collectionViewLayout = customLayout
     }
-    
-    
     @objc func handleUpdateFeed() {
         handleRefresh()
     }
@@ -186,7 +171,6 @@ class GroupRollController: UICollectionViewController {
 
                     let groups = userDictionary["groups"] as? [String : Any] ?? [:]
 
-                    
                     let userToAdd = User(uid: userIDToAdd, username: usernameToAdd, phonenumber: phonenumberToAdd, groups: groups)
                     
                     let creationDateFormat = self.parseDuration(creationDateToAdd ?? "")
@@ -254,10 +238,17 @@ class GroupRollController: UICollectionViewController {
 
         let url = URL(string: pic.post.imageUrl)
         cell.photoImageView.kf.setImage(with: url)
-        cell.photoImageView.contentMode = .scaleAspectFit
 
+        print("cellForItem called")
         cell.configureCell(isSelectedByUser: objects[indexPath.row].isSelectedByUser)
                 
+        //Customize cell height
+//        if let image = cell.photoImageView.image {
+//            let isLandscape = image.size.width > image.size.height
+//            let height = getVariableHeightForImage(isLandscape: isLandscape)
+//            cell.frame = CGRect(x: cell.frame.origin.x, y: cell.frame.origin.y, width: cell.frame.size.width, height: height)
+//        }
+        
         return cell
     }
     
@@ -471,8 +462,6 @@ class GroupRollController: UICollectionViewController {
         self.collectionView.reloadData()
         self.actualPrintButton.isEnabled = false
         self.actualPrintButton.alpha = 0.75
-
-
     }
     
     @objc func handleBack(){
@@ -611,8 +600,6 @@ class GroupRollController: UICollectionViewController {
                     //self.getFormattedImageAndAddToArray(prev: fixedImage)
                 }
             }
-            
-            
         })
     }
     
@@ -737,46 +724,58 @@ extension UIViewController {
 extension GroupRollController {
     func applyFormatingOnImageAndAddToArray(prev: UIImage) {
         //var prev = UIImage()
-        
+
         guard let cgimage = prev.cgImage else {return}
         let originalCIImage = CIImage(cgImage: cgimage, options: [.applyOrientationProperty:true])
         //        guard let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.8) else {return}
         let sepiaCIImage = originalCIImage
-        
+
         var previewImage = UIImage()
         previewImage = UIImage(ciImage: sepiaCIImage)
+
+//        let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
+        
+        //Calculate the height
+        /*
+         1. If image width is greater than height, height should be half of the image.
+         2. 
+         */
+        
+        let isLandscape = prev.size.width > prev.size.height
+        let viewHeight = getVariableHeightForImage(isLandscape: isLandscape)
         
         let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
+        //let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: viewHeight))
         containerView.backgroundColor = .white
-        
+
         let groopImage = UIImageView()
         containerView.addSubview(groopImage)
-       
-//        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
-        
+
+        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
         groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
 
         groopImage.contentMode = .scaleAspectFill
         groopImage.clipsToBounds = true
         groopImage.backgroundColor = .clear
         groopImage.image = previewImage
+        
 //        groopImage.layer.borderColor = UIColor.black.cgColor
 //        groopImage.layer.borderWidth = 2
-                
+
         let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
         groopCamLabel.sizeToFit()
         containerView.addSubview(groopCamLabel)
         groopCamLabel.anchor(top: groopImage.bottomAnchor, left: nil, bottom: nil, right: groopImage.rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: 0, paddingRight: 1, width: 200, height: 20)
         groopCamLabel.setCharacterSpacing(-0.4)
-        
+
         containerView.layer.masksToBounds = false
         containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        
+
         //This is where the image size changes from it's original size. Need to handle this thing.
         guard let image = imageWithView(view: containerView) else {return}
-        
+
         arrImages.append(image)
-        
+
         if arrImages.count == assetCount {
             print("Image array count is: \(arrImages.count)")
             startUploading {
@@ -785,9 +784,28 @@ extension GroupRollController {
         }
     }
     
+    func getVariableHeightForImage(isLandscape: Bool) -> CGFloat {
+        var calculatedHeight: CGFloat = 0
+        let viewWidth = view.frame.width
+        
+        //Landscape
+        print("isLandscape is: \(isLandscape)")
+        if isLandscape {
+            calculatedHeight = viewWidth / 4
+        }
+
+        //Portrait
+        else  {
+            calculatedHeight = (viewWidth*1.561) - 40
+        }
+                
+        return calculatedHeight
+    }
+    
     func imageWithView(view: UIView) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
         defer { UIGraphicsEndImageContext() }
+        
         view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
         return UIGraphicsGetImageFromCurrentImageContext()
     }
@@ -796,6 +814,7 @@ extension GroupRollController {
     func getFormattedImageAndAddToArray(prev: UIImage) {
         //var prev = UIImage()
         let imageView = UIImageView(image: prev)
+        imageView.contentMode = .scaleAspectFit
     
         imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
 
@@ -811,8 +830,6 @@ extension GroupRollController {
     }
     
     //**********//
-    
-    
     func startUploading(completion: @escaping FileCompletionBlock) {
          if arrImages.count == 0 {
             completion()
@@ -884,44 +901,21 @@ extension GroupRollController {
     }
     
     func showActivityIndicator() {
-//        activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
-//        activityIndicator!.center = self.collectionView.center
-//        self.collectionView.addSubview(activityIndicator!)
         activityIndicator!.startAnimating()
     }
     
     func hideActivityIndicator() {
         activityIndicator!.stopAnimating()
-//        activityIndicator?.removeFromSuperview()
-//        activityIndicator = nil
     }
 }
 
-//extension GroupRollController : QuiltViewDelegate {
-//  func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, blockSizeForItemAtIndexPath indexPath: IndexPath) -> CGSize {
-//
-//        let remainder = indexPath.row % 2
-//        if remainder == 0 {
-//            //return CGSize(width: 1, height: 2)
-//        }
-//        return CGSize(width: 2, height: 2)
-//  }
-//
-//  // Set the spacing between the cells
-//  func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetsForItemAtIndexPath indexPath: IndexPath) -> UIEdgeInsets {
-//    return UIEdgeInsets(top: 100, left: 2, bottom: 2, right: 10)
-//    //return UIEdgeInsets(top: 19, left: 14, bottom: 19, right: 14)
-//  }
-//
-//}
- 
-
-
 extension GroupRollController: UICollectionViewDelegateFlowLayout {
+    //Horizontal spacing
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 23
     }
 
+    //Vertical spacing
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 40
     }
@@ -930,17 +924,20 @@ extension GroupRollController: UICollectionViewDelegateFlowLayout {
         return UIEdgeInsets(top: 19, left: 14, bottom: 19, right: 14)
     }
 
-
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let pic = self.objects[indexPath.row]
-        
+
+        print("sizeForItem called")
         print("Image size is: \(pic.post.imageWidth) X \(pic.post.imageHeight)")
         print("Image URL is: \(pic.post.imageUrl)\n")
 
         let width = (view.frame.width - 2) / 3
-        let height = CGFloat(pic.post.imageHeight)
-        return CGSize(width: width - 25, height: width*1.561 - 40)
+        //let height = CGFloat(pic.post.imageHeight)
         
-       // return CGSize(width: width - 25, height: height)
+        let testHeight = indexPath.row % 2 == 0 ? view.frame.width / 4 : width*1.561 - 40
+        
+        //return CGSize(width: width - 25, height: width*1.561 - 40)
+        return CGSize(width: width - 25, height: testHeight)
     }
 }
+

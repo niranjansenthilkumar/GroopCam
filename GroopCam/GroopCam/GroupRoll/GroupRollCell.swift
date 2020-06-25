@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import AVFoundation
 class PrintableObject {
 
     var isSelectedByUser: Bool
@@ -33,9 +33,9 @@ class GroupRollCell: UICollectionViewCell {
     
     var photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
+        iv.contentMode = .scaleToFill
         iv.clipsToBounds = true
-        iv.backgroundColor = .white
+        iv.backgroundColor = .clear
         return iv
     }()
     
@@ -54,7 +54,7 @@ class GroupRollCell: UICollectionViewCell {
 
     var groopImage: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
+        iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
         iv.backgroundColor = Theme.bColor
         return iv
@@ -86,37 +86,20 @@ class GroupRollCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = .white
         
         addSubview(photoImageView)
         
         photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
         
-        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        photoImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+//        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+//        photoImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
         photoImageView.layer.masksToBounds = false
 
         photoImageView.layer.shouldRasterize = false
-        
 
-//        photoImageView.addSubview(groopImage)
-//        groopImage.anchor(top: photoImageView.topAnchor, left: photoImageView.leftAnchor, bottom: photoImageView.bottomAnchor, right: photoImageView.rightAnchor, paddingTop: 9, paddingLeft: 6, paddingBottom: 23, paddingRight: 6, width: 87.88, height: 117.05)
-//
-//        groopImage.layer.shouldRasterize = false
-//
-//        photoImageView.addSubview(groupNameLabel)
-//        groupNameLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 1, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(dateLabel)
-//        dateLabel.anchor(top: groupNameLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 1, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(groopCamLabel)
-//        groopCamLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: -1, paddingBottom: 2, paddingRight: 0, width: 200, height: 6)
-//
         photoImageView.addSubview(selectedBackground)
 //        addSubview(selectedBackground)
         selectedBackground.anchor(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: -1, paddingRight: 0, width: 0, height: 0)

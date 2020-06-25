@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		367600F0249E596C0087DF58 /* FirebaseFilesUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */; };
+		36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37624A3BAFB00E80786 /* CustomLayout.swift */; };
 		5E02EF184985C9C6404D8659 /* Pods_GroopCam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */; };
 		8A8D61D42409EF0900203016 /* StripeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D32409EF0900203016 /* StripeClient.swift */; };
 		8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D6240B247000203016 /* CheckoutViewController.swift */; };
@@ -66,6 +67,7 @@
 
 /* Begin PBXFileReference section */
 		367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseFilesUpload.swift; sourceTree = "<group>"; };
+		36F8E37624A3BAFB00E80786 /* CustomLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLayout.swift; sourceTree = "<group>"; };
 		8A8D61D32409EF0900203016 /* StripeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeClient.swift; sourceTree = "<group>"; };
 		8A8D61D6240B247000203016 /* CheckoutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutViewController.swift; sourceTree = "<group>"; };
 		8A8D61D7240B247000203016 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 			isa = PBXGroup;
 			children = (
 				367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */,
+				36F8E37624A3BAFB00E80786 /* CustomLayout.swift */,
 			);
 			path = "Custom Classes";
 			sourceTree = "<group>";
@@ -494,6 +497,7 @@
 				8A8D61F6240B247000203016 /* SettingsViewController.swift in Sources */,
 				8AD5774923C6EB010072CDD7 /* FriendCell.swift in Sources */,
 				8AD5772223C2596E0072CDD7 /* MainController.swift in Sources */,
+				36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */,
 				8AD5770523C1E8590072CDD7 /* SceneDelegate.swift in Sources */,
 				8A8D61EA240B247000203016 /* UIScrollView.swift in Sources */,
 				8A8D61ED240B247000203016 /* UIColor.swift in Sources */,
