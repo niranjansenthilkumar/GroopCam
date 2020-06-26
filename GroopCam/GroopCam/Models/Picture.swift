@@ -20,8 +20,9 @@ struct Picture {
     var isSelectedByUser: Bool
     var imageWidth: Double
     var imageHeight: Double
+    var isHorizontal: Bool
     
-    init(user: User, imageUrl: String, creationDate: TimeInterval, groupName: String, isDeveloped: Bool, isSelectedByUser: Bool, picID: String, imageWidth: Double, imageHeight: Double){
+    init(user: User, imageUrl: String, creationDate: TimeInterval, groupName: String, isDeveloped: Bool, isSelectedByUser: Bool, picID: String, imageWidth: Double, imageHeight: Double, isHorizontal: Bool){
         self.user = user
         self.imageUrl = imageUrl
         self.creationDate = creationDate
@@ -31,6 +32,7 @@ struct Picture {
         self.id = picID
         self.imageWidth = imageWidth
         self.imageHeight = imageHeight
+        self.isHorizontal = isHorizontal
     }
     
 }

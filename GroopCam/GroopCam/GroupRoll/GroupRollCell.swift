@@ -96,8 +96,8 @@ class GroupRollCell: UICollectionViewCell {
 //        photoImageView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        photoImageView.layer.masksToBounds = false
 
+        photoImageView.layer.masksToBounds = false
         photoImageView.layer.shouldRasterize = false
 
         photoImageView.addSubview(selectedBackground)

@@ -14,6 +14,12 @@ import Photos
 import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
+
+struct Image {
+    let image: UIImage
+    let isHorizontal: Bool
+}
+
 class GroupRollController: UICollectionViewController {
     
     var username: String = ""
@@ -53,7 +59,7 @@ class GroupRollController: UICollectionViewController {
     
         
     var activityIndicator: UIActivityIndicatorView?
-    var arrImages = [UIImage]()
+    var arrImages = [Image]()
     var assetCount = 0
     var initialPostsCount = 0
     typealias FileCompletionBlock = () -> Void
@@ -93,11 +99,14 @@ class GroupRollController: UICollectionViewController {
         activityIndicator!.center = self.collectionView.center
         self.collectionView.addSubview(activityIndicator!)
     
-
         //Custom layout
         let customLayout = CustomLayout()
-        collectionView.collectionViewLayout = customLayout
+        //collectionView.collectionViewLayout = customLayout
+        
+        let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .justified, verticalAlignment: .bottom)
+        collectionView.collectionViewLayout = alignedFlowLayout
     }
+    
     @objc func handleUpdateFeed() {
         handleRefresh()
     }
@@ -159,6 +168,13 @@ class GroupRollController: UICollectionViewController {
                 
                 guard let imageWidth = dictionary["imageWidth"] as? Double else {return}
                 guard let imageHeight = dictionary["imageHeight"] as? Double else {return}
+                
+                var isHorizontal = false
+                if let isExistingImageHorizontal = dictionary["isHorizontal"] as? Bool {
+                    isHorizontal = isExistingImageHorizontal
+                }
+                
+                
                 let imageURLToAdd = imageURL as? String ?? ""
                 
                 Database.database().reference().child("users").child(userIDToAdd).observeSingleEvent(of: .value) { (usersnapshot) in
@@ -175,7 +191,7 @@ class GroupRollController: UICollectionViewController {
                     
                     let creationDateFormat = self.parseDuration(creationDateToAdd ?? "")
                                         
-                    let post = Picture(user: userToAdd, imageUrl: imageURLToAdd, creationDate: creationDateFormat, groupName: groupNameToAdd, isDeveloped: false, isSelectedByUser: false, picID: key, imageWidth: imageWidth, imageHeight: imageHeight)
+                    let post = Picture(user: userToAdd, imageUrl: imageURLToAdd, creationDate: creationDateFormat, groupName: groupNameToAdd, isDeveloped: false, isSelectedByUser: false, picID: key, imageWidth: imageWidth, imageHeight: imageHeight, isHorizontal: isHorizontal)
                                         
                     
                     self.posts.append(post)
@@ -392,6 +408,7 @@ class GroupRollController: UICollectionViewController {
             
             self.navigationItem.backBarButtonItem = nil
             self.navigationItem.leftBarButtonItem = nil
+            self.navigationItem.rightBarButtonItems = nil
 
             
             self.navigationItem.setRightBarButton(UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(self.handleCancel)), animated: false)
@@ -443,6 +460,8 @@ class GroupRollController: UICollectionViewController {
         //self.navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(self.handleCamera)), animated: false)
 
         self.navigationItem.backBarButtonItem = UIBarButtonItem(image: UIImage(named: "backbutton"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(self.handleBack))
+        
+        addRightBarButtonItems()
 
         self.isSelected = false
 
@@ -633,7 +652,10 @@ class GroupRollController: UICollectionViewController {
         self.navigationItem.title = groupTitle
         
 //        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleCamera))
-
+        addRightBarButtonItems()
+    }
+    
+    func addRightBarButtonItems() {
         let cameraButton = UIBarButtonItem(image: UIImage(named: "cameraiconwhite")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleCamera))
         
         let galleryButton = UIBarButtonItem(image: UIImage(named: "galleryIcon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(openGallery))
@@ -665,6 +687,11 @@ extension UIViewController {
 
         dismiss(animated: false)
     }
+    var topbarHeight: CGFloat {
+        return (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) +
+            (self.navigationController?.navigationBar.frame.height ?? 0.0)
+    }
+
 }
 
 extension Date {
@@ -726,6 +753,8 @@ extension GroupRollController {
         //var prev = UIImage()
 
         guard let cgimage = prev.cgImage else {return}
+        
+        let isHorizontal = prev.size.width > prev.size.height
         let originalCIImage = CIImage(cgImage: cgimage, options: [.applyOrientationProperty:true])
         //        guard let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.8) else {return}
         let sepiaCIImage = originalCIImage
@@ -741,8 +770,7 @@ extension GroupRollController {
          2. 
          */
         
-        let isLandscape = prev.size.width > prev.size.height
-        let viewHeight = getVariableHeightForImage(isLandscape: isLandscape)
+        let viewHeight = getVariableHeightForImage(isLandscape: isHorizontal)
         
         let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
         //let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: viewHeight))
@@ -774,7 +802,9 @@ extension GroupRollController {
         //This is where the image size changes from it's original size. Need to handle this thing.
         guard let image = imageWithView(view: containerView) else {return}
 
-        arrImages.append(image)
+        let objImage = Image(image: image, isHorizontal: isHorizontal)
+        
+        arrImages.append(objImage)
 
         if arrImages.count == assetCount {
             print("Image array count is: \(arrImages.count)")
@@ -811,23 +841,23 @@ extension GroupRollController {
     }
 
     //Test - Zubair
-    func getFormattedImageAndAddToArray(prev: UIImage) {
-        //var prev = UIImage()
-        let imageView = UIImageView(image: prev)
-        imageView.contentMode = .scaleAspectFit
-    
-        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-
-        //This is where the image size changes from it's original size. Need to handle this thing.
-        arrImages.append(imageView.image!)
-        
-        if arrImages.count == assetCount {
-            print("Image array count is: \(arrImages.count)")
-            startUploading {
-                print("start uploading")
-            }
-        }
-    }
+//    func getFormattedImageAndAddToArray(prev: UIImage) {
+//        //var prev = UIImage()
+//        let imageView = UIImageView(image: prev)
+//        imageView.contentMode = .scaleAspectFit
+//
+//        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+//
+//        //This is where the image size changes from it's original size. Need to handle this thing.
+//        arrImages.append(imageView.image!)
+//
+//        if arrImages.count == assetCount {
+//            print("Image array count is: \(arrImages.count)")
+//            startUploading {
+//                print("Uploading finished")
+//            }
+//        }
+//    }
     
     //**********//
     func startUploading(completion: @escaping FileCompletionBlock) {
@@ -850,8 +880,9 @@ extension GroupRollController {
             
             guard let groupName = self.group?.groupname else {return}
             
-            let image = arrImages[index]
+            let image = arrImages[index].image
             
+            let isHorizontal = arrImages[index].isHorizontal
             guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
             
             let picId = NSUUID().uuidString
@@ -862,7 +893,7 @@ extension GroupRollController {
                     print(url ?? "Couldn't not upload. You can either check the error or just skip this.")
                     
                     if let strUrl = url {
-                        self.saveToDatabaseWithImageUrl(imageUrl: strUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId)
+                        self.saveToDatabaseWithImageUrl(imageUrl: strUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId, isHorizontal: isHorizontal)
                     }
                     
                     self.uploadImage(forIndex: index + 1)
@@ -880,10 +911,10 @@ extension GroupRollController {
         }
     }
     
-    func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String) {
+    func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String, isHorizontal: Bool) {
         let postImage = image
                 
-        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID] as [String : Any]
+        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID, "isHorizontal": isHorizontal] as [String : Any]
         
         let picValues = [picId: values]
         
@@ -928,15 +959,11 @@ extension GroupRollController: UICollectionViewDelegateFlowLayout {
         let pic = self.objects[indexPath.row]
 
         print("sizeForItem called")
-        print("Image size is: \(pic.post.imageWidth) X \(pic.post.imageHeight)")
-        print("Image URL is: \(pic.post.imageUrl)\n")
 
         let width = (view.frame.width - 2) / 3
-        //let height = CGFloat(pic.post.imageHeight)
         
-        let testHeight = indexPath.row % 2 == 0 ? view.frame.width / 4 : width*1.561 - 40
+        let testHeight = pic.post.isHorizontal ? (width*1.561 - 40) / 2 : width*1.561 - 40
         
-        //return CGSize(width: width - 25, height: width*1.561 - 40)
         return CGSize(width: width - 25, height: testHeight)
     }
 }

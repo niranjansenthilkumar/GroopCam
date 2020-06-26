@@ -185,13 +185,14 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         let groopImage = UIImageView()
         containerView.addSubview(groopImage)
-        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
+        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
         groopImage.contentMode = .scaleAspectFill
         groopImage.clipsToBounds = true
         groopImage.backgroundColor = .clear
         groopImage.image = previewImage
-        groopImage.layer.borderColor = UIColor.black.cgColor
-        groopImage.layer.borderWidth = 2
+        
+//        groopImage.layer.borderColor = UIColor.black.cgColor
+//        groopImage.layer.borderWidth = 2
         
         if devicePosition == "front" {
             groopImage.transform = CGAffineTransform(scaleX: -1, y: 1)
