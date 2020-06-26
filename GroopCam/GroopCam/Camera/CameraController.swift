@@ -163,6 +163,8 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         guard let prevImage = UIImage(data: imageData!) else {return}
         let previm = prevImage.fixOrientation()
         
+        let isHorizongal = previm.size.width > previm.size.height
+        
         var prev = UIImage()
         if devicePosition == "front" {
             prev = previm.withHorizontallyFlippedOrientation()
@@ -210,8 +212,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
 
         
         guard let image = imageWithView(view: containerView) else {return}
-        handleSave(image: image)
-        
+        handleSave(image: image, isHorizontal: isHorizongal)
     }
     
     func imageWithView(view: UIView) -> UIImage? {
@@ -223,7 +224,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     var selectedImage: UIImage?
     
-    func handleSave(image: UIImage){
+    func handleSave(image: UIImage, isHorizontal: Bool){
         
         print(123, "please")
         
@@ -265,18 +266,18 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
                 
                 print("successfully fetched url")
                 
-                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId)
+                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId, isHorizontal: isHorizontal)
                 
             }
         }
     }
     
-    fileprivate func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String) {
+    fileprivate func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String, isHorizontal: Bool) {
         let postImage = image
 
 //        let picId = NSUUID().uuidString
                 
-        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID] as [String : Any]
+        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID, "isHorizontal": isHorizontal] as [String : Any]
         
         let picValues = [picId: values]
         

@@ -243,7 +243,6 @@ class GroupRollController: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-       
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupRollCell
         
 //        let post = self.posts[indexPath.row]
@@ -292,6 +291,7 @@ class GroupRollController: UICollectionViewController {
                 }
             }
         }
+            
         else{
             let pictureVC = PictureController()
             pictureVC.groupNameLabel.text = post.groupName
@@ -761,16 +761,8 @@ extension GroupRollController {
 
         var previewImage = UIImage()
         previewImage = UIImage(ciImage: sepiaCIImage)
-
-//        let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
         
-        //Calculate the height
-        /*
-         1. If image width is greater than height, height should be half of the image.
-         2. 
-         */
-        
-        let viewHeight = getVariableHeightForImage(isLandscape: isHorizontal)
+        //let viewHeight = getVariableHeightForImage(isLandscape: isHorizontal)
         
         let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
         //let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: viewHeight))
