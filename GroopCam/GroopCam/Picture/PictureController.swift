@@ -71,21 +71,43 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
                 
         view.addSubview(photoImageView)
-        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
-        
-        photoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        photoImageView.layer.masksToBounds = false
-
+        //photoImageView.layer.masksToBounds = false
         photoImageView.layer.shouldRasterize = false
 
-
+        if let isHorizontal = picture?.isHorizontal {
+            if isHorizontal {
+                showHorizontalImage()
+            }
+            else {
+                showVerticalImage()
+            }
+        }
+        else {
+            showVerticalImage()
+        }
+        
     }
     
     static let updatePictureNotificationName = NSNotification.Name(rawValue: "UpdatePictureFeed")
     
+    func showVerticalImage() {
+        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
+
+        photoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    }
+    
+    func showHorizontalImage() {
+        let imageHeight = (view.frame.size.height / 2) - 80
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+                
+        photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        photoImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        photoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        photoImageView.heightAnchor.constraint(equalToConstant: imageHeight).isActive = true
+
+    }
     @objc func toggleSettings(){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
