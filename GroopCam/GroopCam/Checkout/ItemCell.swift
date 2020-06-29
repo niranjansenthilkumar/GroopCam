@@ -13,11 +13,13 @@ class QuantityObject {
     var quantity: Int
     var printableObject: PrintableObject
     var image: UIImage
+    var isHorizontal: Bool
 
-    init(quantity: Int, printableObject: PrintableObject, image: UIImage) {
+    init(quantity: Int, printableObject: PrintableObject, image: UIImage, isHorizontal: Bool) {
         self.quantity = quantity
         self.printableObject = printableObject
         self.image = image
+        self.isHorizontal = isHorizontal
     }
 }
 
@@ -37,6 +39,14 @@ class ItemCell: UICollectionViewCell {
         iv.backgroundColor = .white
         return iv
     }()
+    
+    let testImage: CustomImageView = {
+        let iv = CustomImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.backgroundColor = .white
+        return iv
+    }()
+
 //
 //    let photoImageView: UIImageView = {
 //        let iv = UIImageView()
@@ -110,18 +120,6 @@ class ItemCell: UICollectionViewCell {
         return button
     }()
 //    
-//    @objc func handleTap(gesture: UITapGestureRecognizer) {
-//        print("Handling increase in cell...")
-//        delegate?.didIncrease(for: self)
-//    }
-
-//    @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
-//
-//        gesture.minimumPressDuration = 1.0
-//        if gesture.state == .began {
-//            delegate?.didIncrease(for: self)
-//        }
-//    }
 
     @objc func handleIncrease(){
         print("Handling increase in cell...")
@@ -155,36 +153,29 @@ class ItemCell: UICollectionViewCell {
         
         addSubview(photoImageView)
 
-        photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 150)
-
-        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        photoImageView.layer.masksToBounds = false
-//
-//        photoImageView.addSubview(groopImage)
-//        groopImage.anchor(top: photoImageView.topAnchor, left: photoImageView.leftAnchor, bottom: photoImageView.bottomAnchor, right: photoImageView.rightAnchor, paddingTop: 9, paddingLeft: 6, paddingBottom: 23, paddingRight: 6, width: 87.88, height: 117.05)
-//
-//        photoImageView.addSubview(groupNameLabel)
-//        groupNameLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 1, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(dateLabel)
-//        dateLabel.anchor(top: groupNameLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 1, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(groopCamLabel)
-//        groopCamLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: -1, paddingBottom: 2, paddingRight: 0, width: 200, height: 6)
-        
-        photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        
+        //photoImageView.layer.masksToBounds = false
+
         addSubview(quantityView)
         quantityView.anchor(top: nil, left: nil, bottom: nil, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 26, width: 100, height: 25)
         
         quantityView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
                     
         setupQuantityView()
+    }
+        
+    func showVerticalImage() {
+        photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 150)
+
+        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+    }
+    
+    func showHorizontalImage() {
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        photoImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 20).isActive = true
+        photoImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
+        photoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
     }
     
     func setupQuantityView(){

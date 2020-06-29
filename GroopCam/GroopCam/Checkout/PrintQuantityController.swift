@@ -50,7 +50,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
 
         layoutViews()
         
-        
         for object in objects {
             self.total += object.quantity
             self.quantity += object.quantity
@@ -99,9 +98,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         for object in objects {
             quantity += object.quantity
         }
-//
-//        self.objects[indexPath.item] = picture
-//
+
         UIView.performWithoutAnimation {
             self.collectionView.reloadItems(at: [indexPath])
         }
@@ -109,15 +106,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         total = quantity
         
         self.totalLabel.text = "Total: $" + String(self.total) + ".00"
-
-//
-//        print(picture.quantity, "please")
-//
-//        if total > quantity && picture.quantity != 1 {
-//            self.total -= 1
-//            self.totalLabel.text = "Total: $" + String(self.total) + ".00"
-//        }
-
 
     }
     
@@ -128,21 +116,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     @objc func handleCheckout(){
         
         checkoutButton.animateButtonDown()
-        
-        
-//        // 1
-//        guard CheckoutCart.shared.canPay else {
-//          let alertController = UIAlertController(title: "Warning", message: "Your cart is empty", preferredStyle: .alert)
-//          let alertAction = UIAlertAction(title: "OK", style: .default)
-//          alertController.addAction(alertAction)
-//          present(alertController, animated: true)
-//          return
-//        }
-//        // 2
-//        let addCardViewController = STPAddCardViewController()
-//        addCardViewController.delegate = self
-//        navigationController?.pushViewController(addCardViewController, animated: true)
-        
         if total < 5 {
             self.presentFailedCheckout()
         }
@@ -181,7 +154,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
             let applePayController = PKPaymentAuthorizationViewController(paymentRequest: request)
             applePayController?.delegate = self
             self.present(applePayController!, animated: true, completion: nil)
-
         }
     }
 
@@ -208,8 +180,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     var alternate: Bool = false
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-       
-    
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ItemCell
                         
         cell.cellQuantity = objects[indexPath.item]
@@ -230,41 +200,28 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         }
         
         if total >= 5 {
-//            UIView.transition(with: view, duration: 0.2, options: .transitionCrossDissolve, animations: {
-//                self.checkoutButton.alpha = 1.0
-//                self.checkoutButton.isEnabled = true
-
-//            })
             self.checkoutButton.layoutIfNeeded()
             self.checkoutButton.fadeIn()
             self.checkoutButton.isEnabled = true
         }
         else{
-//            UIView.transition(with: view, duration: 0.2, options: .transitionCrossDissolve, animations: {
-
-//            })
-            
-            
                 self.checkoutButton.layoutIfNeeded()
                 self.checkoutButton.fadeOut()
                 self.checkoutButton.isEnabled = false
-//            self.checkoutButton.layoutIfNeeded()
-//            self.checkoutButton.fadeOut()
-//            self.checkoutButton.isEnabled = false
         }
         
         
         let object = self.objects[indexPath.row]
-//        let url = URL(fileURLWithPath: object.printableObject.post.imageUrl)
-//        cell.photoImageView.kf.setImage(with: url)
+        
         cell.photoImageView.image = object.image
         
-//        cell.groopImage.image = object.image
-//        cell.groupNameLabel.text = object.printableObject.post.groupName
-//        cell.usernameLabel.text = "taken by: " + object.printableObject.post.user.username
-//        cell.dateLabel.text = Date(timeIntervalSince1970: object.printableObject.post.creationDate).asString(style: .long)
-//
-    
+        if object.isHorizontal {
+            cell.showHorizontalImage()
+        }
+        else {
+            cell.showVerticalImage()
+        }
+            
         return cell
     }
 

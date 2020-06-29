@@ -505,7 +505,7 @@ class GroupRollController: UICollectionViewController {
                 let imageView = UIImageView()
                 imageView.kf.setImage(with: url)
                 
-                printObjectArray.append(QuantityObject(quantity: 1, printableObject: object, image: imageView.image ?? UIImage()))
+                printObjectArray.append(QuantityObject(quantity: 1, printableObject: object, image: imageView.image ?? UIImage(), isHorizontal: object.post.isHorizontal))
             }
         }
         
@@ -513,7 +513,7 @@ class GroupRollController: UICollectionViewController {
             self.presentFailedCheckout()
         }
         else{
-            let printQuantityVC =         PrintQuantityController(collectionViewLayout: UICollectionViewFlowLayout())
+            let printQuantityVC = PrintQuantityController(collectionViewLayout: UICollectionViewFlowLayout())
             
             printQuantityVC.objects = printObjectArray
             
