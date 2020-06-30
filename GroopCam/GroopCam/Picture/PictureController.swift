@@ -68,7 +68,11 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         
         view.backgroundColor = Theme.backgroundColor
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
+        let uploadButton = UIBarButtonItem(image: UIImage(named: "uploadicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(shareAction))
+        
+        let deleteButton = UIBarButtonItem(image: UIImage(named: "deleteicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(deleteAction))
+        
+        self.navigationItem.rightBarButtonItems = [deleteButton, uploadButton]
                 
         view.addSubview(photoImageView)
         photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
@@ -100,70 +104,120 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     
     static let updatePictureNotificationName = NSNotification.Name(rawValue: "UpdatePictureFeed")
     
-    @objc func toggleSettings(){
+    @objc func deleteAction(){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-                        
-        alert.addAction(UIAlertAction(title: "Share", style: .default , handler:{ (UIAlertAction)in
-            print("User click Share button")
-            
-            if !MFMessageComposeViewController.canSendText() {
-                self.presentMessageServiceError()
-                return
-            }
-            
-            let textComposer = MFMessageComposeViewController()
-            textComposer.messageComposeDelegate = self
-            textComposer.body = "Check out this pic I took on GroopCam 📸 https://apple.co/2S052xI"
-
-            if MFMessageComposeViewController.canSendAttachments() {
-                let imageData = self.photoImageView.asImage().jpegData(compressionQuality: 0.5)
-                textComposer.addAttachmentData(imageData!, typeIdentifier: "image/jpg", filename: "photo.jpg")
-            }
-            
-            self.present(textComposer, animated: true)
-
-            
-        }))
-
+        
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive , handler:{ (UIAlertAction)in
-            print("User click Delete button")
-            
-            guard let pictureId = self.picture?.id else {return}
-            
-            let storageRef = Storage.storage().reference().child("posts").child(pictureId)
-            
-            storageRef.delete { (err) in
-                if let err = err {
-                    print("failed to delete image")
-                    
-                }
-                
-                guard let groupId = self.groupId else {return}
-                
-                Database.database().reference().child("posts").child(groupId).child(pictureId).removeValue()
+                   print("User click Delete button")
+                   
+                   guard let pictureId = self.picture?.id else {return}
+                   
+                   let storageRef = Storage.storage().reference().child("posts").child(pictureId)
+                   
+                   storageRef.delete { (err) in
+                       if let err = err {
+                           print("failed to delete image")
+                           
+                       }
+                       
+                       guard let groupId = self.groupId else {return}
+                       
+                       Database.database().reference().child("posts").child(groupId).child(pictureId).removeValue()
 
-                print("successfully deleted image")
-                
-                NotificationCenter.default.post(name: PictureController.updatePictureNotificationName, object: nil)
+                       print("successfully deleted image")
+                       
+                       NotificationCenter.default.post(name: PictureController.updatePictureNotificationName, object: nil)
 
-                
-                self.navigationController?.popViewController(animated: true)
-            }
-            
-        }))
+                       
+                       self.navigationController?.popViewController(animated: true)
+                   }
+                   
+               }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
-            print("User click Dismiss button")
+                   print("User click Dismiss button")
+               
+           
+               }))
+
+               self.present(alert, animated: true, completion: {
+                   print("completion block")
+               })
         
+    }
     
+    @objc func shareAction(){
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Share", style: .default , handler:{ (UIAlertAction)in
+                   print("User click Share button")
+                   
+                   if !MFMessageComposeViewController.canSendText() {
+                       self.presentMessageServiceError()
+                       return
+                   }
+                   
+                   let textComposer = MFMessageComposeViewController()
+                   textComposer.messageComposeDelegate = self
+                   textComposer.body = "Check out this pic I took on GroopCam 📸 https://apple.co/2S052xI"
+
+                   if MFMessageComposeViewController.canSendAttachments() {
+                       let imageData = self.photoImageView.asImage().jpegData(compressionQuality: 0.5)
+                       textComposer.addAttachmentData(imageData!, typeIdentifier: "image/jpg", filename: "photo.jpg")
+                   }
+                   
+                   self.present(textComposer, animated: true)
+
+                   
+               }))
+                        
+        alert.addAction(UIAlertAction(title: "Add to Camera Roll", style: .default , handler:{ (UIAlertAction)in
+                   print("User click Add to Cam Roll button")
+
+                   guard let pictureId = self.picture?.id else {return}
+        
+                   let storageRef = Storage.storage().reference().child("posts").child(pictureId)
+            
+                   storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                    
+                       if let error = error {
+                       print("failed to download image")
+                       }
+                    
+                       else {
+                       let pic = UIImage(data: data!)
+                       // UIImageWriteToSavedPhotosAlbum(pic!, nil, nil, nil);
+                       let imageSaver = ImageSaver()
+                        imageSaver.writeToPhotoAlbum(image: pic!)
+                       }
+                   }
+        }))
+        
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
+                   print("User click Dismiss button")
+        
         }))
 
         self.present(alert, animated: true, completion: {
-            print("completion block")
+                   print("completion block")
         })
         
     }
+    
+    // Handles context parameters after saving a photo to the library
+    class ImageSaver: NSObject {
+        func writeToPhotoAlbum(image: UIImage) {
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
+        }
+
+        @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+            print("picture added to photo library")
+        }
+    }
+        
     
     func sendText() {
             if (MFMessageComposeViewController.canSendText()) {
