@@ -12,6 +12,8 @@ import FirebaseAuth
 import FirebaseStorage
 import MessageUI
 
+import Photos
+
 class PictureController: UIViewController, UIActionSheetDelegate, MFMessageComposeViewControllerDelegate {
     
     var picture: Picture?
@@ -133,17 +135,17 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
                        self.navigationController?.popViewController(animated: true)
                    }
                    
-               }))
+        }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
                    print("User click Dismiss button")
                
            
-               }))
+        }))
 
                self.present(alert, animated: true, completion: {
                    print("completion block")
-               })
+        })
         
     }
     
@@ -171,28 +173,12 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
                    self.present(textComposer, animated: true)
 
                    
-               }))
+        }))
                         
         alert.addAction(UIAlertAction(title: "Add to Camera Roll", style: .default , handler:{ (UIAlertAction)in
                    print("User click Add to Cam Roll button")
-
-                   guard let pictureId = self.picture?.id else {return}
-        
-                   let storageRef = Storage.storage().reference().child("posts").child(pictureId)
             
-                   storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                    
-                       if let error = error {
-                       print("failed to download image")
-                       }
-                    
-                       else {
-                       let pic = UIImage(data: data!)
-                       // UIImageWriteToSavedPhotosAlbum(pic!, nil, nil, nil);
-                       let imageSaver = ImageSaver()
-                        imageSaver.writeToPhotoAlbum(image: pic!)
-                       }
-                   }
+                   self.savePhotoToLibrary()
         }))
         
         
@@ -207,16 +193,53 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         
     }
     
-    // Handles context parameters after saving a photo to the library
-    class ImageSaver: NSObject {
-        func writeToPhotoAlbum(image: UIImage) {
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveError), nil)
-        }
-
-        @objc func saveError(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-            print("picture added to photo library")
+    func savePhotoToLibrary() {
+        
+        guard let pictureId = self.picture?.id else {return}
+           
+          let storageRef = Storage.storage().reference().child("posts").child(pictureId)
+               
+          storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                       
+          if let error = error {
+             print("failed to download image")
+          }
+                       
+          else {
+                let pic = UIImage(data: data!)
+            UIImageWriteToSavedPhotosAlbum(pic!, self, #selector(self.photoSaver), nil)
+          }
         }
     }
+
+    @objc func photoSaver(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+            if let error = error {
+    
+                let ac = UIAlertController(title: "Error", message: "Your picture could not be saved. \nClick Settings to change your settings and give GroopCam access to your photo library.", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default))
+                
+                let settingsAction = UIAlertAction(title: "Settings", style: .default) { (_) -> Void in
+
+                    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                        return
+                    }
+
+                    if UIApplication.shared.canOpenURL(settingsUrl) {
+                        UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                            print("Settings opened: \(success)")
+                        })
+                    }
+                }
+                
+                ac.addAction(settingsAction)
+                present(ac, animated: true)
+                
+            } else {
+                let ac = UIAlertController(title: "Saved", message: "Your picture has been saved to your photo library.", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default))
+                present(ac, animated: true)
+            }
+        }
         
     
     func sendText() {
@@ -252,3 +275,5 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     }
     
 }
+
+
