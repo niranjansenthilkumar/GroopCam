@@ -19,9 +19,9 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     
     let photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
+        iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
-        iv.backgroundColor = .white
+        iv.backgroundColor = .clear
         return iv
     }()
     
@@ -99,7 +99,7 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     }
     
     func showHorizontalImage() {
-        let imageHeight = (view.frame.size.height / 2) - 80
+        let imageHeight = view.frame.size.height / 4
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
                 
         photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
@@ -155,7 +155,6 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
                 
                 NotificationCenter.default.post(name: PictureController.updatePictureNotificationName, object: nil)
 
-                
                 self.navigationController?.popViewController(animated: true)
             }
             

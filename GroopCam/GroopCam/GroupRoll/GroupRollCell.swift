@@ -33,7 +33,7 @@ class GroupRollCell: UICollectionViewCell {
     
     var photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleToFill
+        iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
         iv.backgroundColor = .clear
         return iv
@@ -86,7 +86,7 @@ class GroupRollCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = .white
+        self.backgroundColor = .clear
         
         addSubview(photoImageView)
         

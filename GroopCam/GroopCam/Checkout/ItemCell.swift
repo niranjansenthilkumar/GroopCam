@@ -34,19 +34,12 @@ class ItemCell: UICollectionViewCell {
         
     let photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
+        iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
-        iv.backgroundColor = .white
+        iv.backgroundColor = .clear
         return iv
     }()
     
-    let testImage: CustomImageView = {
-        let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.backgroundColor = .white
-        return iv
-    }()
-
 //
 //    let photoImageView: UIImageView = {
 //        let iv = UIImageView()
@@ -147,8 +140,7 @@ class ItemCell: UICollectionViewCell {
         
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        
+    
         backgroundColor = Theme.cellColor
         
         addSubview(photoImageView)
@@ -163,7 +155,7 @@ class ItemCell: UICollectionViewCell {
                     
         setupQuantityView()
     }
-        
+    
     func showVerticalImage() {
         photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 150)
 

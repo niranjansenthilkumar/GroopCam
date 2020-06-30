@@ -244,26 +244,16 @@ class GroupRollController: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupRollCell
-        
-//        let post = self.posts[indexPath.row]
-        
+                        
         let pic = self.objects[indexPath.row]
         
         cell.post = pic.post
 
         let url = URL(string: pic.post.imageUrl)
         cell.photoImageView.kf.setImage(with: url)
-
-        print("cellForItem called")
-        cell.configureCell(isSelectedByUser: objects[indexPath.row].isSelectedByUser)
-                
-        //Customize cell height
-//        if let image = cell.photoImageView.image {
-//            let isLandscape = image.size.width > image.size.height
-//            let height = getVariableHeightForImage(isLandscape: isLandscape)
-//            cell.frame = CGRect(x: cell.frame.origin.x, y: cell.frame.origin.y, width: cell.frame.size.width, height: height)
-//        }
         
+        cell.configureCell(isSelectedByUser: objects[indexPath.row].isSelectedByUser)
+                        
         return cell
     }
     
@@ -756,17 +746,16 @@ extension GroupRollController {
         
         let isHorizontal = prev.size.width > prev.size.height
         let originalCIImage = CIImage(cgImage: cgimage, options: [.applyOrientationProperty:true])
-        //        guard let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.8) else {return}
         let sepiaCIImage = originalCIImage
 
         var previewImage = UIImage()
         previewImage = UIImage(ciImage: sepiaCIImage)
         
-        //let viewHeight = getVariableHeightForImage(isLandscape: isHorizontal)
+        let viewHeight = getVariableHeightForImage(isLandscape: isHorizontal)
         
-        let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
-        //let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: viewHeight))
-        containerView.backgroundColor = .white
+        //let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
+        let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: viewHeight))
+        containerView.backgroundColor = .clear
 
         let groopImage = UIImageView()
         containerView.addSubview(groopImage)
@@ -774,7 +763,7 @@ extension GroupRollController {
         groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
         groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
 
-        groopImage.contentMode = .scaleAspectFill
+        groopImage.contentMode = .scaleAspectFit
         groopImage.clipsToBounds = true
         groopImage.backgroundColor = .clear
         groopImage.image = previewImage
@@ -782,11 +771,12 @@ extension GroupRollController {
 //        groopImage.layer.borderColor = UIColor.black.cgColor
 //        groopImage.layer.borderWidth = 2
 
-        let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
-        groopCamLabel.sizeToFit()
-        containerView.addSubview(groopCamLabel)
-        groopCamLabel.anchor(top: groopImage.bottomAnchor, left: nil, bottom: nil, right: groopImage.rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: 0, paddingRight: 1, width: 200, height: 20)
-        groopCamLabel.setCharacterSpacing(-0.4)
+//        let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
+//        groopCamLabel.sizeToFit()
+//        containerView.addSubview(groopCamLabel)
+//        groopCamLabel.anchor(top: groopImage.bottomAnchor, left: nil, bottom: nil, right: groopImage.rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: 0, paddingRight: 1, width: 200, height: 20)
+//
+//        groopCamLabel.setCharacterSpacing(-0.4)
 
         containerView.layer.masksToBounds = false
         containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
@@ -808,28 +798,36 @@ extension GroupRollController {
     
     func getVariableHeightForImage(isLandscape: Bool) -> CGFloat {
         var calculatedHeight: CGFloat = 0
-        let viewWidth = view.frame.width
         
         //Landscape
         print("isLandscape is: \(isLandscape)")
         if isLandscape {
-            calculatedHeight = viewWidth / 4
+            calculatedHeight = (view.frame.width) / 2
         }
 
         //Portrait
         else  {
-            calculatedHeight = (viewWidth*1.561) - 40
+            calculatedHeight = (view.frame.width) * 1.561
         }
                 
         return calculatedHeight
     }
     
     func imageWithView(view: UIView) -> UIImage? {
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
-        defer { UIGraphicsEndImageContext() }
         
-        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
-        return UIGraphicsGetImageFromCurrentImageContext()
+        let renderer = UIGraphicsImageRenderer(size: view.bounds.size)
+        let image = renderer.image { ctx in
+            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        }
+
+        return image
+        
+//        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0.0)
+//        defer { UIGraphicsEndImageContext() }
+//
+//        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+//        return UIGraphicsGetImageFromCurrentImageContext()
+        
     }
 
     //Test - Zubair
@@ -875,12 +873,15 @@ extension GroupRollController {
             let image = arrImages[index].image
             
             let isHorizontal = arrImages[index].isHorizontal
+            
             guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
             
+            guard let pngData = image.pngData() else {return}
+            //let testImage = UIImage(data: pngData)
             let picId = NSUUID().uuidString
             
-            Storage.storage().reference().child("posts").child(picId).putData(uploadData, metadata: nil) { (metadata, err) in
-                FirFile.shared.upload(data: uploadData, withName: picId, block: { (url) in
+            Storage.storage().reference().child("posts").child(picId).putData(pngData, metadata: nil) { (metadata, err) in
+                FirFile.shared.upload(data: pngData, withName: picId, block: { (url) in
                     /// After successfully uploading call this method again by increment the **index = index + 1**
                     print(url ?? "Couldn't not upload. You can either check the error or just skip this.")
                     
@@ -949,8 +950,6 @@ extension GroupRollController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let pic = self.objects[indexPath.row]
-
-        print("sizeForItem called")
 
         let width = (view.frame.width - 2) / 3
         
