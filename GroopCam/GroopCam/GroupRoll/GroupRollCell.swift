@@ -33,8 +33,8 @@ class GroupRollCell: UICollectionViewCell {
     
     var photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFit
-        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        //iv.clipsToBounds = true
         iv.backgroundColor = .clear
         return iv
     }()
@@ -88,6 +88,8 @@ class GroupRollCell: UICollectionViewCell {
         super.init(frame: frame)
         self.backgroundColor = .clear
         
+        self.clipsToBounds = true
+        
         addSubview(photoImageView)
         
         photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: bottomAnchor, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
@@ -97,8 +99,8 @@ class GroupRollCell: UICollectionViewCell {
 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
 
-        photoImageView.layer.masksToBounds = false
-        photoImageView.layer.shouldRasterize = false
+        //photoImageView.layer.masksToBounds = false
+        //photoImageView.layer.shouldRasterize = false
 
         photoImageView.addSubview(selectedBackground)
 //        addSubview(selectedBackground)

@@ -99,15 +99,12 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     }
     
     func showHorizontalImage() {
-        let imageHeight = view.frame.size.height / 4
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
-                
-        photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        photoImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
+        photoImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12).isActive = true
         photoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        photoImageView.heightAnchor.constraint(equalToConstant: imageHeight).isActive = true
-
     }
+
     @objc func toggleSettings(){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

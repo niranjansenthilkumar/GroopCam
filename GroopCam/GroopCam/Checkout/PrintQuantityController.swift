@@ -215,11 +215,14 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
         cell.photoImageView.image = object.image
         
+        //cell.showHorizontalImage()
         if object.isHorizontal {
             cell.showHorizontalImage()
+            print("Showing Horizontal Image")
         }
         else {
             cell.showVerticalImage()
+            print("Showing Vertical Image")
         }
             
         return cell

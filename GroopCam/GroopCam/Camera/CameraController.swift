@@ -129,9 +129,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     @objc func handleCapturePhoto() {
         print("Capturing photo...")
-        
-        print(123)
-                
+                        
         UIView.animate(withDuration: 0.1, animations: {
             self.flashView.alpha = 1.0
         }, completion: { _ in
@@ -140,8 +138,12 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             })
         })
             
-        let settings = AVCapturePhotoSettings()
+        if let photoOutputConnection = output.connection(with: AVMediaType.video) {
+            photoOutputConnection.videoOrientation = getCurrentOrientation()
+        }
 
+        let settings = AVCapturePhotoSettings()
+        
         guard let previewFormatType = settings.availablePreviewPhotoPixelFormatTypes.first else { return }
 
         settings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewFormatType]
@@ -150,6 +152,37 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
 //        NotificationCenter.default.post(name: CameraController.updateGroopFeedNotificationName, object: nil)
 
+    }
+    
+    func getCurrentOrientation() -> AVCaptureVideoOrientation {
+        let currentDevice = UIDevice.current
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        
+        let deviceOrientation = currentDevice.orientation
+
+        var imageOrientation: AVCaptureVideoOrientation!
+
+        if deviceOrientation == .portrait {
+            imageOrientation = .portrait
+            print("Device: Portrait")
+        }else if (deviceOrientation == .landscapeLeft){
+            imageOrientation = .landscapeRight
+            print("Device: LandscapeLeft")
+        }else if (deviceOrientation == .landscapeRight){
+            imageOrientation = .landscapeLeft
+            print("Device LandscapeRight")
+        }else if (deviceOrientation == .portraitUpsideDown){
+            imageOrientation = .portraitUpsideDown
+            print("Device PortraitUpsideDown")
+        }else{
+            imageOrientation = .portrait
+        }
+        
+        return imageOrientation
+    }
+
+    override var shouldAutorotate: Bool {
+        return true
     }
     
     var username: String = ""
@@ -165,10 +198,12 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         let isHorizongal = previm.size.width > previm.size.height
         
+        getFormattedImageAndSave(prev: previm, isHorizontal: isHorizongal)
+        
+        /*
         var prev = UIImage()
         if devicePosition == "front" {
             prev = previm.withHorizontallyFlippedOrientation()
-//            prev = UIImage(cgImage: previm.cgImage!, scale: previm.scale, orientation: UIImage.Orientation.leftMirrored)
         }
         else{
             prev = previm
@@ -176,7 +211,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         guard let cgimage = prev.cgImage else {return}
         let originalCIImage = CIImage(cgImage: cgimage, options: [.applyOrientationProperty:true])
-//        guard let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.8) else {return}
+
         let sepiaCIImage = originalCIImage
 
         var previewImage = UIImage()
@@ -193,8 +228,6 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         groopImage.backgroundColor = .clear
         groopImage.image = previewImage
         
-//        groopImage.layer.borderColor = UIColor.black.cgColor
-//        groopImage.layer.borderWidth = 2
         
         if devicePosition == "front" {
             groopImage.transform = CGAffineTransform(scaleX: -1, y: 1)
@@ -213,6 +246,8 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         guard let image = imageWithView(view: containerView) else {return}
         handleSave(image: image, isHorizontal: isHorizongal)
+ */
+        
     }
     
     func imageWithView(view: UIView) -> UIImage? {
@@ -224,7 +259,21 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     var selectedImage: UIImage?
     
-    func handleSave(image: UIImage, isHorizontal: Bool){
+    func getFormattedImageAndSave(prev: UIImage, isHorizontal: Bool) {
+        //var prev = UIImage()
+        let imageView = UIImageView(image: prev)
+        imageView.contentMode = .scaleAspectFit
+
+        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+
+        //This is where the image size changes from it's original size. Need to handle this thing.
+        
+        let image = Image(image: imageView.image!, isHorizontal: isHorizontal)
+
+        handleSave(image: image)
+        
+    }
+    func handleSave(image: Image, isHorizontal: Bool = false){
         
         print(123, "please")
         
@@ -244,7 +293,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         print(256, "please")
         
-        guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
+        guard let uploadData = image.image.jpegData(compressionQuality: 0.5) else { return }
         
         let picId = NSUUID().uuidString
         
@@ -266,7 +315,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
                 
                 print("successfully fetched url")
                 
-                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId, isHorizontal: isHorizontal)
+                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image.image, picId: picId, isHorizontal: image.isHorizontal)
                 
             }
         }

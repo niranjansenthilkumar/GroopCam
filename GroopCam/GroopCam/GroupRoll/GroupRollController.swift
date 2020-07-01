@@ -85,8 +85,6 @@ class GroupRollController: UICollectionViewController {
         self.showSpinner(onView: self.collectionView)
         fetchPostsWithGroupID(groupID: groupId)
         
-        
-        print(groupCount, "pleeeeease")
         if groupCount == 1 {
             self.friendButton.setTitle(String(groupCount) + " friend 👥", for: .normal)
         }
@@ -112,8 +110,6 @@ class GroupRollController: UICollectionViewController {
     }
     
     @objc func handleRefresh() {
-        
-        print("Handling refresh..")
         guard let groupId = self.group?.groupid else {return}
         self.posts.removeAll()
         self.objects.removeAll()
@@ -154,7 +150,7 @@ class GroupRollController: UICollectionViewController {
             dictionaries.forEach { (key, value) in
                 guard let dictionary = value as? [String : Any] else {return}
                 
-                print(key, value)
+               // print(key, value)
                 
                 
                 let userIDToAdd = dictionary["userid"] as? String ?? ""
@@ -539,7 +535,6 @@ class GroupRollController: UICollectionViewController {
     }
     
     @objc func handleCamera(){
-        print(123)
         
         let cameraController = CameraController()
         cameraController.group = self.group
@@ -587,26 +582,33 @@ class GroupRollController: UICollectionViewController {
                     // Do something with image
 
                     guard let dictInfo = info as? [String:Any] else {
+                        self.hideActivityIndicator()
                         return
                     }
                     
                     guard let isDegraded = dictInfo["PHImageResultIsDegradedKey"] as? Bool else {
+                        self.hideActivityIndicator()
+                        print("isDegraded not found")
                         return
                     }
                                         
                     guard !isDegraded else {
+                        self.hideActivityIndicator()
+                        print("isDegraded is true")
                         return
                     }
                     
                     guard let fetchedImage = image else {
+                        self.hideActivityIndicator()
+                        print("NO IMAGE FOUND")
                         return
                     }
                     
                     
                     print("isDegraded is: \(isDegraded)")
                     let fixedImage = fetchedImage.fixOrientation()
-                    self.applyFormatingOnImageAndAddToArray(prev: fixedImage)
-                    //self.getFormattedImageAndAddToArray(prev: fixedImage)
+                    //self.applyFormatingOnImageAndAddToArray(prev: fixedImage)
+                    self.getFormattedImageAndAddToArray(prev: fixedImage)
                 }
             }
         })
@@ -677,11 +679,7 @@ extension UIViewController {
 
         dismiss(animated: false)
     }
-    var topbarHeight: CGFloat {
-        return (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) +
-            (self.navigationController?.navigationBar.frame.height ?? 0.0)
-    }
-
+    
 }
 
 extension Date {
@@ -771,12 +769,12 @@ extension GroupRollController {
 //        groopImage.layer.borderColor = UIColor.black.cgColor
 //        groopImage.layer.borderWidth = 2
 
-//        let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
-//        groopCamLabel.sizeToFit()
-//        containerView.addSubview(groopCamLabel)
-//        groopCamLabel.anchor(top: groopImage.bottomAnchor, left: nil, bottom: nil, right: groopImage.rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: 0, paddingRight: 1, width: 200, height: 20)
-//
-//        groopCamLabel.setCharacterSpacing(-0.4)
+        let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
+        groopCamLabel.sizeToFit()
+        containerView.addSubview(groopCamLabel)
+        groopCamLabel.anchor(top: groopImage.bottomAnchor, left: nil, bottom: nil, right: groopImage.rightAnchor, paddingTop: -1, paddingLeft: 0, paddingBottom: 0, paddingRight: 1, width: 200, height: 20)
+
+        groopCamLabel.setCharacterSpacing(-0.4)
 
         containerView.layer.masksToBounds = false
         containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
@@ -831,23 +829,26 @@ extension GroupRollController {
     }
 
     //Test - Zubair
-//    func getFormattedImageAndAddToArray(prev: UIImage) {
-//        //var prev = UIImage()
-//        let imageView = UIImageView(image: prev)
-//        imageView.contentMode = .scaleAspectFit
-//
-//        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-//
-//        //This is where the image size changes from it's original size. Need to handle this thing.
-//        arrImages.append(imageView.image!)
-//
-//        if arrImages.count == assetCount {
-//            print("Image array count is: \(arrImages.count)")
-//            startUploading {
-//                print("Uploading finished")
-//            }
-//        }
-//    }
+    func getFormattedImageAndAddToArray(prev: UIImage) {
+        //var prev = UIImage()
+        let imageView = UIImageView(image: prev)
+        imageView.contentMode = .scaleAspectFit
+
+        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+
+        //This is where the image size changes from it's original size. Need to handle this thing.
+        
+        let isHorizontal = prev.size.width > prev.size.height
+        let image = Image(image: imageView.image!, isHorizontal: isHorizontal)
+        arrImages.append(image)
+
+        if arrImages.count == assetCount {
+            print("Image array count is: \(arrImages.count)")
+            startUploading {
+                print("Uploading finished")
+            }
+        }
+    }
     
     //**********//
     func startUploading(completion: @escaping FileCompletionBlock) {
@@ -876,12 +877,12 @@ extension GroupRollController {
             
             guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
             
-            guard let pngData = image.pngData() else {return}
+            //guard let pngData = image.pngData() else {return}
             //let testImage = UIImage(data: pngData)
             let picId = NSUUID().uuidString
             
-            Storage.storage().reference().child("posts").child(picId).putData(pngData, metadata: nil) { (metadata, err) in
-                FirFile.shared.upload(data: pngData, withName: picId, block: { (url) in
+            Storage.storage().reference().child("posts").child(picId).putData(uploadData, metadata: nil) { (metadata, err) in
+                FirFile.shared.upload(data: uploadData, withName: picId, block: { (url) in
                     /// After successfully uploading call this method again by increment the **index = index + 1**
                     print(url ?? "Couldn't not upload. You can either check the error or just skip this.")
                     
@@ -955,7 +956,10 @@ extension GroupRollController: UICollectionViewDelegateFlowLayout {
         
         let testHeight = pic.post.isHorizontal ? (width*1.561 - 40) / 2 : width*1.561 - 40
         
+        print("Image is: \(pic.post.imageUrl) \n Size is: \(CGSize(width: width - 25, height: testHeight))")
+
         return CGSize(width: width - 25, height: testHeight)
+        //return CGSize(width: 80, height: 80)
     }
 }
 

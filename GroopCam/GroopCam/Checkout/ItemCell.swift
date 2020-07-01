@@ -35,15 +35,18 @@ class ItemCell: UICollectionViewCell {
     let photoImageView: CustomImageView = {
         let iv = CustomImageView()
         iv.contentMode = .scaleAspectFit
-        iv.clipsToBounds = true
+        //iv.clipsToBounds = true
         iv.backgroundColor = .clear
         return iv
     }()
     
-//
-//    let photoImageView: UIImageView = {
-//        let iv = UIImageView()
-//        iv.backgroundColor = .yellow
+    
+//    let photoImageView: UIImageViewAligned = {
+//        let iv = UIImageViewAligned()
+//        iv.alignLeft = true
+//        iv.contentMode = .scaleAspectFit
+//        //iv.clipsToBounds = true
+//        iv.backgroundColor = .white
 //        return iv
 //    }()
     
@@ -141,7 +144,9 @@ class ItemCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
     
-        backgroundColor = Theme.cellColor
+        //backgroundColor = Theme.cellColor
+        //clipsToBounds = true
+        backgroundColor = .clear
         
         addSubview(photoImageView)
 
@@ -157,19 +162,26 @@ class ItemCell: UICollectionViewCell {
     }
     
     func showVerticalImage() {
-        photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 150)
-
+        removeExistingConstraints()
+        photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 0)
         photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        
     }
     
     func showHorizontalImage() {
+        removeExistingConstraints()
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
         photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        photoImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 20).isActive = true
+        photoImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12).isActive = true
         photoImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        photoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        //photoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
     }
     
+    func removeExistingConstraints() {
+        for constraint in photoImageView.constraints {
+            photoImageView.removeConstraint(constraint)
+        }
+    }
     func setupQuantityView(){
         let stackView = UIStackView(arrangedSubviews: [decreaseButton, quantity, increaseButton])
     

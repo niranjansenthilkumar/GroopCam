@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		366A977F24ACABEF00250A17 /* UIImageViewAligned.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366A977E24ACABEE00250A17 /* UIImageViewAligned.swift */; };
 		367600F0249E596C0087DF58 /* FirebaseFilesUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */; };
 		36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37624A3BAFB00E80786 /* CustomLayout.swift */; };
 		36F8E37924A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */; };
@@ -67,6 +68,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		366A977E24ACABEE00250A17 /* UIImageViewAligned.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageViewAligned.swift; sourceTree = "<group>"; };
 		367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseFilesUpload.swift; sourceTree = "<group>"; };
 		36F8E37624A3BAFB00E80786 /* CustomLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLayout.swift; sourceTree = "<group>"; };
 		36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlignedCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */,
 				36F8E37624A3BAFB00E80786 /* CustomLayout.swift */,
 				36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */,
+				366A977E24ACABEE00250A17 /* UIImageViewAligned.swift */,
 			);
 			path = "Custom Classes";
 			sourceTree = "<group>";
@@ -497,6 +500,7 @@
 				8AD5771C23C1E8AA0072CDD7 /* PhoneVerificationController.swift in Sources */,
 				36F8E37924A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift in Sources */,
 				8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */,
+				366A977F24ACABEF00250A17 /* UIImageViewAligned.swift in Sources */,
 				8A8D61E9240B247000203016 /* MyAPIClient.swift in Sources */,
 				8A8D61F6240B247000203016 /* SettingsViewController.swift in Sources */,
 				8AD5774923C6EB010072CDD7 /* FriendCell.swift in Sources */,
@@ -673,7 +677,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 39DDS7649B;
+				DEVELOPMENT_TEAM = Q45FN4P4G5;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -684,7 +688,7 @@
 					STRIPE_ENABLE_APPLEPAY,
 				);
 				INFOPLIST_FILE = GroopCam/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -709,7 +713,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 39DDS7649B;
+				DEVELOPMENT_TEAM = Q45FN4P4G5;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -720,7 +724,7 @@
 					STRIPE_ENABLE_APPLEPAY,
 				);
 				INFOPLIST_FILE = GroopCam/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
