@@ -31,7 +31,7 @@ protocol ItemCellDelegate {
 class ItemCell: UICollectionViewCell {
     
     var delegate: ItemCellDelegate?
-        
+            
     let photoImageView: CustomImageView = {
         let iv = CustomImageView()
         iv.contentMode = .scaleAspectFit
@@ -110,7 +110,6 @@ class ItemCell: UICollectionViewCell {
 //        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(gesture:)))
 //        tap.require(toFail: longPress)
 //        button.addGestureRecognizer(tap)
-
         
         button.addTarget(self, action: #selector(handleIncrease), for: .touchUpInside)
         return button
@@ -149,7 +148,7 @@ class ItemCell: UICollectionViewCell {
         backgroundColor = .clear
         
         addSubview(photoImageView)
-
+ 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
         //photoImageView.layer.masksToBounds = false
 
@@ -160,9 +159,10 @@ class ItemCell: UICollectionViewCell {
                     
         setupQuantityView()
     }
-    
+        
     func showVerticalImage() {
         removeExistingConstraints()
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
         photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 0)
         photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
@@ -170,13 +170,17 @@ class ItemCell: UICollectionViewCell {
     
     func showHorizontalImage() {
         removeExistingConstraints()
+        
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
         photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        photoImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12).isActive = true
+        photoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12).isActive = true
+        photoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 23).isActive = true
         photoImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
-        //photoImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        
+        //layoutIfNeeded()
+        print("Photo ImageView Frame is: \(photoImageView.frame)")
     }
-    
+        
     func removeExistingConstraints() {
         for constraint in photoImageView.constraints {
             photoImageView.removeConstraint(constraint)

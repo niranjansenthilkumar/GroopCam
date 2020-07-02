@@ -210,12 +210,8 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
                 self.checkoutButton.isEnabled = false
         }
         
-        
         let object = self.objects[indexPath.row]
         
-        cell.photoImageView.image = object.image
-        
-        //cell.showHorizontalImage()
         if object.isHorizontal {
             cell.showHorizontalImage()
             print("Showing Horizontal Image")
@@ -224,7 +220,9 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
             cell.showVerticalImage()
             print("Showing Vertical Image")
         }
-            
+
+        cell.photoImageView.image = object.image
+        
         return cell
     }
 

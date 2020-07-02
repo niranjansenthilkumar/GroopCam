@@ -478,11 +478,6 @@ class GroupRollController: UICollectionViewController {
         
         var printObjectArray = [QuantityObject]()
         
-//        for post in self.posts{
-//            if post.isSelectedByUser{
-//                printObjectArray.append(QuantityObject(quantity: 1))
-//            }
-//        }
         var count = 0
         for object in objects{
             if object.isSelectedByUser{
