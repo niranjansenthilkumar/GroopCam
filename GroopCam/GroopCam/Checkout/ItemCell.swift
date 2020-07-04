@@ -170,15 +170,13 @@ class ItemCell: UICollectionViewCell {
     
     func showHorizontalImage() {
         removeExistingConstraints()
-        
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
         photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         photoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12).isActive = true
         photoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 23).isActive = true
         photoImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         
-        //layoutIfNeeded()
-        print("Photo ImageView Frame is: \(photoImageView.frame)")
+        //print("Photo ImageView Frame is: \(photoImageView.frame)")
     }
         
     func removeExistingConstraints() {

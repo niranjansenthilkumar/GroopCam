@@ -14,7 +14,6 @@ import Photos
 import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
-
 struct Image {
     let image: UIImage
     let isHorizontal: Bool
@@ -57,7 +56,38 @@ class GroupRollController: UICollectionViewController {
         return button
     }()
     
+    let viewProgress: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        return view
         
+    }()
+    
+    let dimView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+        return view
+        
+    }()
+
+    
+    let progressView: UIProgressView = {
+        let progressView = UIProgressView(progressViewStyle: .default)
+        progressView.progress = 0.0
+        progressView.progressTintColor = .white
+        return progressView
+    }()
+    
+    let progressLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        label.textColor = .white
+        label.text = "Uploading...."
+        return label
+    }()
+    
+    var progress = Progress()
     var activityIndicator: UIActivityIndicatorView?
     var arrImages = [Image]()
     var assetCount = 0
@@ -67,7 +97,7 @@ class GroupRollController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         collectionView.register(GroupRollCell.self, forCellWithReuseIdentifier: cellId)
         layoutViews()
         
@@ -97,12 +127,93 @@ class GroupRollController: UICollectionViewController {
         activityIndicator!.center = self.collectionView.center
         self.collectionView.addSubview(activityIndicator!)
     
-        //Custom layout
-        let customLayout = CustomLayout()
-        //collectionView.collectionViewLayout = customLayout
+        view.addSubview(dimView)
+        dimView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
+
         
+        //Custom layout
         let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .justified, verticalAlignment: .bottom)
         collectionView.collectionViewLayout = alignedFlowLayout
+        
+        setUpUploadProgressView()
+    }
+    
+    func setUpUploadProgressView() {
+        //Setting up progress for multiple image uploading
+        /*
+         1. Create a custom UIView on Center of the screen.
+         2. Add a UIProgress Bar on UIView
+         3. Take a Progress() object
+         4  Add a label to show total count and current uploading image number
+         5.
+         */
+        //Add custom UIView
+        progressView.progress = 0.0
+        progressView.progressTintColor = .white
+
+        dimView.addSubview(viewProgress)
+        viewProgress.translatesAutoresizingMaskIntoConstraints = false
+        
+        viewProgress.centerXAnchor.constraint(equalTo: dimView.centerXAnchor).isActive = true
+        viewProgress.centerYAnchor.constraint(equalTo: dimView.centerYAnchor).isActive = true
+        
+        viewProgress.widthAnchor.constraint(equalToConstant: 300).isActive = true
+        viewProgress.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        
+        //Add Progress bar
+        viewProgress.addSubview(progressView)
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.leadingAnchor.constraint(equalTo: viewProgress.leadingAnchor, constant: 20).isActive = true
+        progressView.trailingAnchor.constraint(equalTo: viewProgress.trailingAnchor, constant: -20).isActive = true
+        progressView.bottomAnchor.constraint(equalTo: viewProgress.bottomAnchor, constant: -20).isActive = true
+        
+        //Add Label
+        viewProgress.addSubview(progressLabel)
+        progressLabel.translatesAutoresizingMaskIntoConstraints = false
+        progressLabel.leadingAnchor.constraint(equalTo: progressView.leadingAnchor).isActive = true
+        progressLabel.topAnchor.constraint(equalTo: viewProgress.topAnchor, constant: 20).isActive = true
+        
+        progress.completedUnitCount = 0
+    }
+        
+    func updateUploadProgress() {
+        self.progress.completedUnitCount += 1
+        let completedProgres = Float(self.progress.fractionCompleted)
+        //print("Completed Progress is: \(completedProgres)")
+        self.progressView.setProgress(completedProgres, animated: false)
+        
+        if self.progress.completedUnitCount == self.progress.totalUnitCount {
+            print("Progress is completed")
+            self.progressLabel.text = "Uploading Successful"
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                self.enableViews()
+                self.resetUploadProgress()
+            }
+        }
+    }
+    
+    func updateProgressLabel(forIndex index: Int) {
+        self.progressLabel.text = "Uploading (\(index)/\(self.assetCount))"
+    }
+    
+    func resetUploadProgress() {
+        progressView.setProgress(0.0, animated: true)
+        progress.totalUnitCount = 10
+        progress.completedUnitCount = 0
+        progress.totalUnitCount = 0
+    }
+    
+    func disableViews() {
+        UIView.animate(withDuration: 0.2) {
+            self.navigationController?.navigationBar.alpha = 0.5
+            self.dimView.isHidden = false
+        }
+    }
+    
+    func enableViews() {
+        self.navigationController?.navigationBar.alpha = 1.0
+        self.dimView.isHidden = true
     }
     
     @objc func handleUpdateFeed() {
@@ -123,7 +234,6 @@ class GroupRollController: UICollectionViewController {
     }
     
     func getAllPosts() {
-        //showActivityIndicator()
         print("getAllPosts() called")
         guard let groupId = self.group?.groupid else {return}
         self.posts.removeAll()
@@ -208,10 +318,10 @@ class GroupRollController: UICollectionViewController {
                     
                     self.collectionView.reloadData()
                     //self.collectionView?.refreshControl?.endRefreshing()
-                    print("Success")
+                   // print("Success")
                     self.removeSpinner()
                     
-                    print("Posts count is: \(self.posts.count)")
+                    //print("Posts count is: \(self.posts.count)")
                     
                     if self.posts.count == self.initialPostsCount + self.assetCount {
                         print("All posts have been fetched")
@@ -241,15 +351,19 @@ class GroupRollController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupRollCell
                         
-        let pic = self.objects[indexPath.row]
-        
-        cell.post = pic.post
+        if indexPath.row <= objects.count {
+            let pic = self.objects[indexPath.row]
+            
+            cell.post = pic.post
 
-        let url = URL(string: pic.post.imageUrl)
-        cell.photoImageView.kf.setImage(with: url)
+            let url = URL(string: pic.post.imageUrl)
+            cell.photoImageView.kf.setImage(with: url)
+            
+            cell.configureCell(isSelectedByUser: objects[indexPath.row].isSelectedByUser)
+                            
+            return cell
+        }
         
-        cell.configureCell(isSelectedByUser: objects[indexPath.row].isSelectedByUser)
-                        
         return cell
     }
     
@@ -281,9 +395,7 @@ class GroupRollController: UICollectionViewController {
         else{
             let pictureVC = PictureController()
             pictureVC.groupNameLabel.text = post.groupName
-            
-//            pictureVC.groopImage.loadImage(urlString: post.imageUrl)
-            
+                        
             let url = URL(string: post.imageUrl)
 //            pictureVC.groopImage.kf.setImage(with: url)
             pictureVC.photoImageView.kf.setImage(with: url)
@@ -567,12 +679,12 @@ class GroupRollController: UICollectionViewController {
             
             //Upload all the images on firebase storage
             print("Number of assets: \(assets.count)")
+            self.progress.totalUnitCount = Int64(assets.count)
             self.showActivityIndicator()
             for asset in assets {
                 self.assetCount = assets.count
                 print("Asset is: \(asset)")
                 // Request the maximum size. If you only need a smaller size make sure to request that instead.
-                //self.showActivityIndicator()
                 PHImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .default, options: nil) { (image, info) in
                     // Do something with image
 
@@ -827,6 +939,7 @@ extension GroupRollController {
     func getFormattedImageAndAddToArray(prev: UIImage) {
         //var prev = UIImage()
         let imageView = UIImageView(image: prev)
+        //imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
 
         imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
@@ -840,26 +953,31 @@ extension GroupRollController {
         if arrImages.count == assetCount {
             print("Image array count is: \(arrImages.count)")
             startUploading {
-                print("Uploading finished")
             }
         }
     }
     
     //**********//
     func startUploading(completion: @escaping FileCompletionBlock) {
-         if arrImages.count == 0 {
+        if arrImages.count == 0 {
             completion()
             return;
-         }
-
-         block = completion
-         uploadImage(forIndex: 0)
-        //showActivityIndicator()
+        }
+        
+        block = completion
+        
+        disableViews()
+        uploadImage(forIndex: 0)
     }
 
     func uploadImage(forIndex index:Int) {
         if index < arrImages.count {
             /// Perform uploading
+            print("Uploading \(index + 1) of \(self.assetCount)")
+
+            //Show upload progress label
+            updateProgressLabel(forIndex: index + 1)
+            
             guard let uid = Auth.auth().currentUser?.uid else { return }
             
             guard let groupId = self.group?.groupid else {return}
@@ -885,6 +1003,11 @@ extension GroupRollController {
                         self.saveToDatabaseWithImageUrl(imageUrl: strUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId, isHorizontal: isHorizontal)
                     }
                     
+                    //Update progress bar
+                    print("Updating Progress for: \(index + 1) / \(self.progress.totalUnitCount)")
+                    self.updateUploadProgress()
+                    
+                    //Upload next Image
                     self.uploadImage(forIndex: index + 1)
                 })
                 return;
@@ -895,8 +1018,10 @@ extension GroupRollController {
             }
         }
         else {
-            print("No Images remaining to be uploaded")
+            print("All Images have been uploaded.")
             arrImages.removeAll()
+            //enableViews()
+            //resetUploadProgress()
         }
     }
     
@@ -951,7 +1076,7 @@ extension GroupRollController: UICollectionViewDelegateFlowLayout {
         
         let testHeight = pic.post.isHorizontal ? (width*1.561 - 40) / 2 : width*1.561 - 40
         
-        print("Image is: \(pic.post.imageUrl) \n Size is: \(CGSize(width: width - 25, height: testHeight))")
+        //print("Image is: \(pic.post.imageUrl) \n Size is: \(CGSize(width: width - 25, height: testHeight))")
 
         return CGSize(width: width - 25, height: testHeight)
         //return CGSize(width: 80, height: 80)
