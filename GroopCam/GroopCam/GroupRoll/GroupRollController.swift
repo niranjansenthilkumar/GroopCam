@@ -56,6 +56,8 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: PictureController.updatePictureNotificationName, object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(updateGroupNameFunc(notification:)), name: EditGroupController.updateGroupName, object: nil)
+        
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
@@ -559,6 +561,10 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         self.present(navVC, animated: true, completion: nil)
     }
     
+    @objc func updateGroupNameFunc(notification: NSNotification) {
+        self.navigationItem.title = notification.userInfo?["groupName"] as? String
+          }
+    
     
     func layoutViews(){
         
@@ -672,4 +678,5 @@ extension UIViewController {
             vSpinner = nil
         }
     }
+    
 }

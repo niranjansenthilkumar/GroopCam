@@ -24,9 +24,10 @@ class CreateGroupController: UIViewController {
     }()
     
     let nameLabel: UILabel = {
-        let label = UILabel().setupLabel(ofSize: 30, weight: UIFont.Weight.medium, textColor: .white, text: "Name your camera roll.", textAlignment: .center)
+        let label = UILabel().setupLabel(ofSize: 30, weight: UIFont.Weight.medium, textColor: .white, text: "Name your camera roll", textAlignment: .center)
         return label
     }()
+    
         
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -229,6 +229,25 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     @objc func handleDelete(sender: UIButton){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .destructive , handler:{ (UIAlertAction)in
+                    print("User click edit group button")
+         
+                    let data = self.groups[sender.tag]
+                    let groupId = data.groupid
+                    let lastPic = data.lastPicture
+                    let timeStamp = data.creationDate
+            
+                    let editGroupVC = EditGroupController()
+                    editGroupVC.groupId = groupId
+                    editGroupVC.lastPic = lastPic
+                    editGroupVC.timeStamp = timeStamp
+                    self.navigationController?.pushNavBar(vc: editGroupVC)
+                           
+                    self.navigationItem.leftItemsSupplementBackButton = true
+                    self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+                    
+                }))
                 
         alert.addAction(UIAlertAction(title: "Leave Group", style: .destructive , handler:{ (UIAlertAction)in
             print("User click leave button")

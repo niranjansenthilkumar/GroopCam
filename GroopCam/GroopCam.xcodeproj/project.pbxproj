@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D9DBAB024AFCE5B0014FDF0 /* EditGroupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */; };
 		5E02EF184985C9C6404D8659 /* Pods_GroopCam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */; };
 		8A8D61D42409EF0900203016 /* StripeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D32409EF0900203016 /* StripeClient.swift */; };
 		8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D6240B247000203016 /* CheckoutViewController.swift */; };
@@ -63,7 +64,21 @@
 		8AD5776123CBAED60072CDD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AD5776023CBAED50072CDD7 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		5D9DBAA724AFBFCB0014FDF0 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EditGroupController.swift; path = ../../../../../Documents/EditGroupController.swift; sourceTree = "<group>"; };
 		8A8D61D32409EF0900203016 /* StripeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeClient.swift; sourceTree = "<group>"; };
 		8A8D61D6240B247000203016 /* CheckoutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutViewController.swift; sourceTree = "<group>"; };
 		8A8D61D7240B247000203016 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -138,6 +153,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5D9DBAAC24AFCDCF0014FDF0 /* EditGroup */ = {
+			isa = PBXGroup;
+			children = (
+				5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */,
+			);
+			path = EditGroup;
+			sourceTree = "<group>";
+		};
 		8A8D61D5240B247000203016 /* StripeCheckout */ = {
 			isa = PBXGroup;
 			children = (
@@ -196,6 +219,7 @@
 				8AD5772823C3A1800072CDD7 /* Models */,
 				8AD5773F23C4D1480072CDD7 /* Sign Up */,
 				8AD5774023C4D1690072CDD7 /* Home */,
+				5D9DBAAC24AFCDCF0014FDF0 /* EditGroup */,
 				8AD5774123C4D1900072CDD7 /* AddGroup */,
 				8AD5774223C4D1B60072CDD7 /* GroupRoll */,
 				8AD5775423C7970F0072CDD7 /* Camera */,
@@ -352,6 +376,7 @@
 				8AD576FC23C1E8590072CDD7 /* Frameworks */,
 				8AD576FD23C1E8590072CDD7 /* Resources */,
 				9D3DEEEA80F01735635E4171 /* [CP] Embed Pods Frameworks */,
+				5D9DBAA724AFBFCB0014FDF0 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -368,7 +393,7 @@
 		8AD576F723C1E8590072CDD7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1130;
+				LastSwiftUpdateCheck = 1150;
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = NJ;
 				TargetAttributes = {
@@ -504,6 +529,7 @@
 				8AD5775823C797730072CDD7 /* CustomAnimationDismisser.swift in Sources */,
 				8AD5775623C797230072CDD7 /* CameraController.swift in Sources */,
 				8A8D61F3240B247000203016 /* Double.swift in Sources */,
+				5D9DBAB024AFCE5B0014FDF0 /* EditGroupController.swift in Sources */,
 				8AD5772023C255510072CDD7 /* UsernameController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -652,7 +678,7 @@
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UN8GMZ64UC;
+				DEVELOPMENT_TEAM = 8LR99ZY3AY;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -686,7 +712,7 @@
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UN8GMZ64UC;
+				DEVELOPMENT_TEAM = 8LR99ZY3AY;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",

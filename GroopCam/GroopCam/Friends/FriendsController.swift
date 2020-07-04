@@ -13,6 +13,7 @@ import FirebaseAuth
 class FriendsController: UITableViewController, UIActionSheetDelegate {
     
     var group: Group?
+    
     var contactsToNotAdd: [String] = []
     
     let cellIdentifier: String = "tableCell"
@@ -27,8 +28,6 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         tableView?.refreshControl = refreshControl
 
-
-                
         fetchMembers()
                 
     }
@@ -118,6 +117,24 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
     
     @objc func toggleSettings(){
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .destructive , handler:{ (UIAlertAction)in
+                           print("User click edit group button")
+                
+            guard let groupId = self.group?.groupid else {return}
+            guard let lastPic = self.group?.lastPicture else {return}
+            guard let timeStamp = self.group?.creationDate else {return}
+                   
+            let editGroupVC = EditGroupController()
+            editGroupVC.groupId = groupId
+            editGroupVC.lastPic = lastPic
+            editGroupVC.timeStamp = timeStamp
+            self.navigationController?.pushNavBar(vc: editGroupVC)
+                                  
+            self.navigationItem.leftItemsSupplementBackButton = true
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+                           
+        }))
                         
         alert.addAction(UIAlertAction(title: "Leave Group", style: .destructive , handler:{ (UIAlertAction)in
             print("User click Delete button")
@@ -169,5 +186,7 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
         self.tableView.backgroundView = UIView()
         tableView.tableFooterView = UIView()
     }
-
+    
 }
+
+
