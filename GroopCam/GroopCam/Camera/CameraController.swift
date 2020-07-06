@@ -28,7 +28,8 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     @objc func handleDismiss() {
         dismiss(animated: true, completion: nil)
 
-        NotificationCenter.default.post(name: CameraController.updateGroopFeedNotificationName, object: nil)
+        //Zubair - Performance optimization
+        //NotificationCenter.default.post(name: CameraController.updateGroopFeedNotificationName, object: nil)
 
     }
     
@@ -349,6 +350,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     let previewLayer = AVCaptureVideoPreviewLayer()
     
     let output = AVCapturePhotoOutput()
+    
     fileprivate func setupCaptureSession() {
 //        let captureSession = AVCaptureSession()
         

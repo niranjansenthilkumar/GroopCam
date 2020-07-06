@@ -75,7 +75,7 @@ class GroupRollController: UICollectionViewController {
     let progressView: UIProgressView = {
         let progressView = UIProgressView(progressViewStyle: .default)
         progressView.progress = 0.0
-        progressView.progressTintColor = .white
+        //progressView.progressTintColor = .white
         return progressView
     }()
     
@@ -112,8 +112,10 @@ class GroupRollController: UICollectionViewController {
         
         guard let groupId = self.group?.groupid else {return}
         
-        self.showSpinner(onView: self.collectionView)
-        fetchPostsWithGroupID(groupID: groupId)
+        //self.showSpinner(onView: self.collectionView)
+        //fetchPostsWithGroupID(groupID: groupId)
+        
+        observeNewPosts(forGroup: groupId)
         
         if groupCount == 1 {
             self.friendButton.setTitle(String(groupCount) + " friend 👥", for: .normal)
@@ -233,17 +235,89 @@ class GroupRollController: UICollectionViewController {
         }
     }
     
-    func getAllPosts() {
-        print("getAllPosts() called")
-        guard let groupId = self.group?.groupid else {return}
-        self.posts.removeAll()
-        self.objects.removeAll()
-        
-        fetchPostsWithGroupID(groupID: groupId, isInitialLoad: false)
-    }
+//    func getAllPosts() {
+//        //print("getAllPosts() called")
+//        guard let groupId = self.group?.groupid else {return}
+//        self.posts.removeAll()
+//        self.objects.removeAll()
+//
+//        fetchPostsWithGroupID(groupID: groupId, isInitialLoad: false)
+//    }
     
     
     var posts = [Picture]()
+    
+    
+    func observeNewPosts(forGroup groupId: String) {
+        Database.database().reference().child("posts").child(groupId).observe(.childAdded) { (snapshot) in
+            guard let dictionary = snapshot.value as? [String:Any] else {
+                return
+            }
+            
+            print("Dict is: \(dictionary)")
+            
+            let key = snapshot.key
+            
+            let userIDToAdd = dictionary["userid"] as? String ?? ""
+                            
+            let creationDateToAdd = dictionary["creationDate"] as? String? ?? ""
+            
+            guard let groupName = dictionary["groupname"] else {return}
+            let groupNameToAdd = groupName as? String ?? ""
+            
+            guard let imageURL = dictionary["imageUrl"] else {return}
+            
+            guard let imageWidth = dictionary["imageWidth"] as? Double else {return}
+            guard let imageHeight = dictionary["imageHeight"] as? Double else {return}
+            
+            var isHorizontal = false
+            if let isExistingImageHorizontal = dictionary["isHorizontal"] as? Bool {
+                isHorizontal = isExistingImageHorizontal
+            }
+            
+            
+            let imageURLToAdd = imageURL as? String ?? ""
+            
+            Database.database().reference().child("users").child(userIDToAdd).observeSingleEvent(of: .value) { (usersnapshot) in
+                
+                guard let userDictionary = usersnapshot.value as? [String: Any] else { return }
+                
+                let usernameToAdd = userDictionary["username"] as? String ?? ""
+                
+                let phonenumberToAdd = userDictionary["phonenumber"] as? String ?? ""
+
+                let groups = userDictionary["groups"] as? [String : Any] ?? [:]
+
+                let userToAdd = User(uid: userIDToAdd, username: usernameToAdd, phonenumber: phonenumberToAdd, groups: groups)
+                
+                let creationDateFormat = self.parseDuration(creationDateToAdd ?? "")
+                                    
+                let post = Picture(user: userToAdd, imageUrl: imageURLToAdd, creationDate: creationDateFormat, groupName: groupNameToAdd, isDeveloped: false, isSelectedByUser: false, picID: key, imageWidth: imageWidth, imageHeight: imageHeight, isHorizontal: isHorizontal)
+                                    
+                
+                self.posts.append(post)
+                
+                self.posts.sort { (p1, p2) -> Bool in
+                    let c1 = Date(timeIntervalSince1970: p1.creationDate)
+                    let c2 = Date(timeIntervalSince1970: p2.creationDate)
+                    return c1.compare(c2) == .orderedDescending
+                }
+                
+                self.objects.append(PrintableObject(isSelectedByUser: false, post: post))
+
+                self.objects.sort { (p1, p2) -> Bool in
+                    let c1 = Date(timeIntervalSince1970: p1.post.creationDate)
+                    let c2 = Date(timeIntervalSince1970: p2.post.creationDate)
+                    return c1.compare(c2) == .orderedDescending
+                }
+                
+                self.collectionView.reloadData()
+                self.removeSpinner()
+
+            }
+        }
+    }
+    
     
     fileprivate func fetchPostsWithGroupID(groupID: String, isInitialLoad: Bool = true) {
         Database.database().reference().child("posts").child(groupID).observeSingleEvent(of: .value) { (snapshot) in
@@ -680,7 +754,7 @@ class GroupRollController: UICollectionViewController {
             //Upload all the images on firebase storage
             print("Number of assets: \(assets.count)")
             self.progress.totalUnitCount = Int64(assets.count)
-            self.showActivityIndicator()
+            //self.showActivityIndicator()
             for asset in assets {
                 self.assetCount = assets.count
                 print("Asset is: \(asset)")
@@ -1040,8 +1114,9 @@ extension GroupRollController {
             
             print("Successfully saved post to DB")
             
-            self.getAllPosts()
+            //self.getAllPosts()
         }
+        
     Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
     }
     
