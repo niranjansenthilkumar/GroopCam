@@ -57,7 +57,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
         self.totalLabel.text = "Total: $" + String(self.total) + ".00"
         
-        checkoutButton.isHidden = !PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: SupportedPaymentNetworks)
+        //checkoutButton.isHidden = !PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: SupportedPaymentNetworks)
         
     }
     
