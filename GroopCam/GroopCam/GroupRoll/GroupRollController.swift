@@ -106,6 +106,7 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
         if self.posts.count == 0 && self.objects.count == 0 {
             self.removeSpinner()
             self.collectionView.reloadData()
+            self.collectionView?.refreshControl?.endRefreshing()
             return
         }
         
@@ -273,8 +274,14 @@ class GroupRollController: UICollectionViewController, UICollectionViewDelegateF
             pictureVC.picture = post
             pictureVC.groupId = self.group?.groupid
             
-//            pictureVC.usernameLabel.text = "taken by: " + post.user.username
-//            pictureVC.dateLabel.text = Date(timeIntervalSince1970: post.creationDate).asString(style: .long)
+            pictureVC.usernameLabel.text = "taken by: @" + post.user.username
+            
+            let picDate = Date(timeIntervalSince1970: post.creationDate)
+            let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: NSLocale.current.identifier)
+            dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
+            pictureVC.dateLabel.text = "date: " + dateFormatter.string(from: picDate)
+            
             self.navigationController?.navigationBar.isHidden = false
             self.navigationItem.leftItemsSupplementBackButton = true
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)

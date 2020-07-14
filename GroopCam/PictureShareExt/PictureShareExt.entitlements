@@ -2,15 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>aps-environment</key>
-	<string>development</string>
-	<key>com.apple.developer.in-app-payments</key>
-	<array>
-		<string>merchant.groopcam1234</string>
-	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.NJ.GroopCam1234.PictureShareExt</string>
+		<string>group.NJ.GroopCam1234</string>
 	</array>
 </dict>
 </plist>

@@ -118,7 +118,7 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
     @objc func toggleSettings(){
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .destructive , handler:{ (UIAlertAction)in
+        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .default , handler:{ (UIAlertAction)in
                            print("User click edit group button")
                 
             guard let groupId = self.group?.groupid else {return}

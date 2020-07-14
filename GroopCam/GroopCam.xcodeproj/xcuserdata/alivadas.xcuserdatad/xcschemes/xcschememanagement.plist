@@ -7,12 +7,27 @@
 		<key>GroopCam.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>9</integer>
+			<integer>0</integer>
+		</dict>
+		<key>PictureShare.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>PictureShareExt.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>25</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>5D9DBA9B24AFBFCA0014FDF0</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>5D9DBAB424B428B20014FDF0</key>
 		<dict>
 			<key>primary</key>
 			<true/>

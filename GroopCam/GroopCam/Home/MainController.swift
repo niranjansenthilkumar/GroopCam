@@ -70,8 +70,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
     }
     
-    
-    
     @objc func handleUpdateFeed() {
         handleRefresh()
     }
@@ -230,7 +228,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .destructive , handler:{ (UIAlertAction)in
+        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .default , handler:{ (UIAlertAction)in
                     print("User click edit group button")
          
                     let data = self.groups[sender.tag]

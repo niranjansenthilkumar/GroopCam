@@ -47,9 +47,9 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>GroopCam would like access to your camera for to take pictures. Your camera won&apos;t be displayed without your permission.</string>
+	<string>GroopCam would like access to your camera for to take pictures. Your camera won't be displayed without your permission.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>GroopCam would like access to your contacts to display friends that use the app. Your contacts won&apos;t be shared without your permission.</string>
+	<string>GroopCam would like access to your contacts to display friends that use the app. Your contacts won't be shared without your permission.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>GroopCam would like access to the Photos app to save pictures.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

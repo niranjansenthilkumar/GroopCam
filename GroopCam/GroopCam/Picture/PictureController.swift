@@ -48,13 +48,13 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     }()
     
     var dateLabel: UILabel = {
-        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .black, text: "December 26th, 2019", textAlignment: .center)
+        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .white, text: "", textAlignment: .center)
         label.sizeToFit()
         return label
      }()
     
     var usernameLabel: UILabel = {
-        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .black, text: "taken by: njkumarr", textAlignment: .center)
+        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .white, text: "", textAlignment: .center)
         label.sizeToFit()
         return label
     }()
@@ -75,9 +75,9 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         let deleteButton = UIBarButtonItem(image: UIImage(named: "deleteicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(deleteAction))
         
         self.navigationItem.rightBarButtonItems = [deleteButton, uploadButton]
-                
+        
         view.addSubview(photoImageView)
-        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
+        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 15, paddingLeft: 24, paddingBottom: 15, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
         
         photoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
@@ -86,18 +86,18 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         photoImageView.layer.masksToBounds = false
 
         photoImageView.layer.shouldRasterize = false
-
+        
+        view.addSubview(usernameLabel)
+        usernameLabel.anchor(top: photoImageView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 15, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
+        
+        view.addSubview(dateLabel)
+        dateLabel.anchor(top: usernameLabel.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 2, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
+        
 //        photoImageView.addSubview(groopImage)
 //        groopImage.anchor(top: photoImageView.topAnchor, left: photoImageView.leftAnchor, bottom: photoImageView.bottomAnchor, right: photoImageView.rightAnchor, paddingTop: 32, paddingLeft: 20, paddingBottom: 72, paddingRight: 20, width: 0, height: 0)
 //
 //        photoImageView.addSubview(groupNameLabel)
 //        groupNameLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(dateLabel)
-//        dateLabel.anchor(top: groupNameLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
 //
 //        photoImageView.addSubview(groopCamLabel)
 //        groopCamLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: -1, paddingBottom: 4, paddingRight: 0, width: 300, height: 16)
@@ -153,6 +153,15 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
+         alert.addAction(UIAlertAction(title: "Share Ext", style: .default , handler:{ (UIAlertAction)in
+                 print("User click Share Ext button")
+            
+            let imageData = self.photoImageView.asImage().jpegData(compressionQuality: 0.5)
+            let shareExtVC = UIActivityViewController(activityItems: [imageData!], applicationActivities: [])
+            self.present(shareExtVC, animated: true)
+            
+         }))
+            
         alert.addAction(UIAlertAction(title: "Share", style: .default , handler:{ (UIAlertAction)in
                    print("User click Share button")
                    

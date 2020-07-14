@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		5D9DBAB024AFCE5B0014FDF0 /* EditGroupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */; };
+		5DF665B424BD1B7A00717C60 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF665B324BD1B7A00717C60 /* ShareViewController.swift */; };
+		5DF665B724BD1B7A00717C60 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5DF665B524BD1B7A00717C60 /* MainInterface.storyboard */; };
+		5DF665BB24BD1B7A00717C60 /* PictureShareExt.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5DF665B124BD1B7A00717C60 /* PictureShareExt.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5E02EF184985C9C6404D8659 /* Pods_GroopCam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */; };
 		8A8D61D42409EF0900203016 /* StripeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D32409EF0900203016 /* StripeClient.swift */; };
 		8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D6240B247000203016 /* CheckoutViewController.swift */; };
@@ -64,6 +67,16 @@
 		8AD5776123CBAED60072CDD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AD5776023CBAED50072CDD7 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		5DF665B924BD1B7A00717C60 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8AD576F723C1E8590072CDD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5DF665B024BD1B7A00717C60;
+			remoteInfo = PictureShareExt;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		5D9DBAA724AFBFCB0014FDF0 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -71,6 +84,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				5DF665BB24BD1B7A00717C60 /* PictureShareExt.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,7 +92,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EditGroupController.swift; path = ../../../../../Documents/EditGroupController.swift; sourceTree = "<group>"; };
+		5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGroupController.swift; sourceTree = "<group>"; };
+		5DF665B124BD1B7A00717C60 /* PictureShareExt.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PictureShareExt.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5DF665B324BD1B7A00717C60 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		5DF665B624BD1B7A00717C60 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		5DF665B824BD1B7A00717C60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5DF665BF24BD1BC000717C60 /* PictureShareExt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PictureShareExt.entitlements; sourceTree = "<group>"; };
 		8A8D61D32409EF0900203016 /* StripeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeClient.swift; sourceTree = "<group>"; };
 		8A8D61D6240B247000203016 /* CheckoutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutViewController.swift; sourceTree = "<group>"; };
 		8A8D61D7240B247000203016 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -142,6 +161,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5DF665AE24BD1B7A00717C60 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8AD576FC23C1E8590072CDD7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -159,6 +185,17 @@
 				5D9DBAAF24AFCE5B0014FDF0 /* EditGroupController.swift */,
 			);
 			path = EditGroup;
+			sourceTree = "<group>";
+		};
+		5DF665B224BD1B7A00717C60 /* PictureShareExt */ = {
+			isa = PBXGroup;
+			children = (
+				5DF665BF24BD1BC000717C60 /* PictureShareExt.entitlements */,
+				5DF665B324BD1B7A00717C60 /* ShareViewController.swift */,
+				5DF665B524BD1B7A00717C60 /* MainInterface.storyboard */,
+				5DF665B824BD1B7A00717C60 /* Info.plist */,
+			);
+			path = PictureShareExt;
 			sourceTree = "<group>";
 		};
 		8A8D61D5240B247000203016 /* StripeCheckout */ = {
@@ -196,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				8AD5770123C1E8590072CDD7 /* GroopCam */,
+				5DF665B224BD1B7A00717C60 /* PictureShareExt */,
 				8AD5770023C1E8590072CDD7 /* Products */,
 				E3B9C08FC56CD5A7DC1B17FB /* Pods */,
 				A4404AEC270CC2BC5391729A /* Frameworks */,
@@ -206,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				8AD576FF23C1E8590072CDD7 /* GroopCam.app */,
+				5DF665B124BD1B7A00717C60 /* PictureShareExt.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -367,6 +406,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5DF665B024BD1B7A00717C60 /* PictureShareExt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5DF665BC24BD1B7A00717C60 /* Build configuration list for PBXNativeTarget "PictureShareExt" */;
+			buildPhases = (
+				5DF665AD24BD1B7A00717C60 /* Sources */,
+				5DF665AE24BD1B7A00717C60 /* Frameworks */,
+				5DF665AF24BD1B7A00717C60 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PictureShareExt;
+			productName = PictureShareExt;
+			productReference = 5DF665B124BD1B7A00717C60 /* PictureShareExt.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		8AD576FE23C1E8590072CDD7 /* GroopCam */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8AD5771323C1E85B0072CDD7 /* Build configuration list for PBXNativeTarget "GroopCam" */;
@@ -381,6 +437,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5DF665BA24BD1B7A00717C60 /* PBXTargetDependency */,
 			);
 			name = GroopCam;
 			productName = GroopCam;
@@ -397,6 +454,9 @@
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = NJ;
 				TargetAttributes = {
+					5DF665B024BD1B7A00717C60 = {
+						CreatedOnToolsVersion = 11.5;
+					};
 					8AD576FE23C1E8590072CDD7 = {
 						CreatedOnToolsVersion = 11.3;
 					};
@@ -416,11 +476,20 @@
 			projectRoot = "";
 			targets = (
 				8AD576FE23C1E8590072CDD7 /* GroopCam */,
+				5DF665B024BD1B7A00717C60 /* PictureShareExt */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5DF665AF24BD1B7A00717C60 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5DF665B724BD1B7A00717C60 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8AD576FD23C1E8590072CDD7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -478,6 +547,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5DF665AD24BD1B7A00717C60 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5DF665B424BD1B7A00717C60 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8AD576FB23C1E8590072CDD7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -536,7 +613,23 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		5DF665BA24BD1B7A00717C60 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5DF665B024BD1B7A00717C60 /* PictureShareExt */;
+			targetProxy = 5DF665B924BD1B7A00717C60 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
+		5DF665B524BD1B7A00717C60 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5DF665B624BD1B7A00717C60 /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
 		8AD5770823C1E8590072CDD7 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -556,6 +649,52 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5DF665BD24BD1B7A00717C60 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PictureShareExt/PictureShareExt.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8LR99ZY3AY;
+				INFOPLIST_FILE = PictureShareExt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam1234.PictureShareExt;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5DF665BE24BD1B7A00717C60 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PictureShareExt/PictureShareExt.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8LR99ZY3AY;
+				INFOPLIST_FILE = PictureShareExt/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam1234.PictureShareExt;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		8AD5771123C1E85B0072CDD7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -674,6 +813,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D7DC9676F3A1D2A406E8BA34 /* Pods-GroopCam.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -695,7 +835,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam1234;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -708,6 +848,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 944D472F9EF9E5A41A141F24 /* Pods-GroopCam.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -729,7 +870,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam1234;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -741,6 +882,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5DF665BC24BD1B7A00717C60 /* Build configuration list for PBXNativeTarget "PictureShareExt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5DF665BD24BD1B7A00717C60 /* Debug */,
+				5DF665BE24BD1B7A00717C60 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8AD576FA23C1E8590072CDD7 /* Build configuration list for PBXProject "GroopCam" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
