@@ -182,7 +182,7 @@ class GroupRollController: UICollectionViewController {
         self.progress.completedUnitCount += 1
         let completedProgres = Float(self.progress.fractionCompleted)
         //print("Completed Progress is: \(completedProgres)")
-        self.progressView.setProgress(completedProgres, animated: false)
+        self.progressView.setProgress(completedProgres, animated: true)
         
         if self.progress.completedUnitCount == self.progress.totalUnitCount {
             print("Progress is completed")
@@ -736,6 +736,15 @@ class GroupRollController: UICollectionViewController {
     }
     
     
+    func showAlertForMaximumImages() {
+        DispatchQueue.main.async {
+            let alertController = UIAlertController(title: "You can't upload more than 10 photos at one time", message: "", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alertController.addAction(okAction)
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
     @objc func openGallery() {
         let imagePicker = ImagePickerController()
         
@@ -750,6 +759,12 @@ class GroupRollController: UICollectionViewController {
         }, finish: { (assets) in
             // User finished selection assets.
             print("User finished selecting assets")
+            
+            //Don't allow user to upload more than 10 images at one time
+            if assets.count > 10 {
+                self.showAlertForMaximumImages()
+                return
+            }
             
             //Upload all the images on firebase storage
             print("Number of assets: \(assets.count)")

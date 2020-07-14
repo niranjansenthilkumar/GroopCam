@@ -94,9 +94,9 @@
             filePath = "GroopCam/GroupRoll/GroupRollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1100"
-            endingLineNumber = "1100"
-            landmarkName = "uploadImage(forIndex:)"
+            startingLineNumber = "1115"
+            endingLineNumber = "1115"
+            landmarkName = "saveToDatabaseWithImageUrl(imageUrl:userID:groupID:groupName:image:picId:isHorizontal:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -110,8 +110,8 @@
             filePath = "GroopCam/GroupRoll/GroupRollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1086"
-            endingLineNumber = "1086"
+            startingLineNumber = "1101"
+            endingLineNumber = "1101"
             landmarkName = "uploadImage(forIndex:)"
             landmarkType = "7">
          </BreakpointContent>
