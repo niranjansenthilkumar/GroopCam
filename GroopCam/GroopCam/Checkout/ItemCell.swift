@@ -165,7 +165,7 @@ class ItemCell: UICollectionViewCell {
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
         photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 0)
         photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        print("Photo ImageView Frame is: \(photoImageView.frame)")
+        //print("Photo ImageView Frame is: \(photoImageView.frame)")
         
     }
     
@@ -177,7 +177,7 @@ class ItemCell: UICollectionViewCell {
         photoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 23).isActive = true
         photoImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         
-        print("Photo ImageView Frame is: \(photoImageView.frame)")
+        //print("Photo ImageView Frame is: \(photoImageView.frame)")
     }
         
     func removeExistingConstraints() {

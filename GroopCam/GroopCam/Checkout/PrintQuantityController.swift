@@ -221,8 +221,13 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
            // print("Showing Vertical Image")
         }
 
-        cell.photoImageView.image = object.image
-        
+        //Z: Fix for Image not showing
+        //cell.photoImageView.image = object.image
+        //Set image with url to load it asynchronously
+        if let url = URL(string: object.printableObject.post.imageUrl) {
+            cell.photoImageView.kf.setImage(with: url)
+        }
+                
         return cell
     }
 

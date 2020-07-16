@@ -39,6 +39,7 @@ class GroupRollController: UICollectionViewController {
         button.titleLabel?.textAlignment = .center
         button.alpha = 1.0
         button.isEnabled = true
+        
         return button
     }()
     
@@ -113,8 +114,8 @@ class GroupRollController: UICollectionViewController {
         guard let groupId = self.group?.groupid else {return}
         
         //self.showSpinner(onView: self.collectionView)
-        //fetchPostsWithGroupID(groupID: groupId)
         
+        //fetchPostsWithGroupID(groupID: groupId)
         observeNewPosts(forGroup: groupId)
         
         if groupCount == 1 {
@@ -254,7 +255,7 @@ class GroupRollController: UICollectionViewController {
                 return
             }
             
-            print("Dict is: \(dictionary)")
+            //print("Dict is: \(dictionary)")
             
             let key = snapshot.key
             
@@ -316,6 +317,10 @@ class GroupRollController: UICollectionViewController {
 
             }
         }
+        
+//        Database.database().reference().child("posts").child(groupId).observeSingleEvent(of: .value) { (snapshot) in
+//            print("All children are iterated")
+//        }
     }
     
     
@@ -424,7 +429,7 @@ class GroupRollController: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupRollCell
-                        
+               
         if indexPath.row <= objects.count {
             let pic = self.objects[indexPath.row]
             
@@ -437,6 +442,8 @@ class GroupRollController: UICollectionViewController {
                             
             return cell
         }
+        
+        
         
         return cell
     }
@@ -661,16 +668,18 @@ class GroupRollController: UICollectionViewController {
     
     
     @objc func handleActualPrintPhotos(){
-        
         var printObjectArray = [QuantityObject]()
         
         var count = 0
         for object in objects{
             if object.isSelectedByUser{
                 count += 1
-                let url = URL(string: object.post.imageUrl)
+                
                 let imageView = UIImageView()
-                imageView.kf.setImage(with: url)
+                
+                //Z: Fix for image not showing on printquantitycontroller
+                //let url = URL(string: object.post.imageUrl)
+                //imageView.kf.setImage(with: url)
                 
                 printObjectArray.append(QuantityObject(quantity: 1, printableObject: object, image: imageView.image ?? UIImage(), isHorizontal: object.post.isHorizontal))
             }
@@ -679,6 +688,7 @@ class GroupRollController: UICollectionViewController {
         if count == 0 {
             self.presentFailedCheckout()
         }
+            
         else{
             let printQuantityVC = PrintQuantityController(collectionViewLayout: UICollectionViewFlowLayout())
             
