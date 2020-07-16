@@ -92,6 +92,8 @@ class VerificationCodeController: UIViewController {
                     
                     NotificationCenter.default.post(name: VerificationCodeController.updateLoggedNotificationName, object: nil)
 
+                    //let appDele = UIApplication.shared.delegate as! AppDelegate
+                    //appDele.setMainControllerAsRoot()
                     self.dismiss(animated: true, completion: nil)
                 }
                 else{
