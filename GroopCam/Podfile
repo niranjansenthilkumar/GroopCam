@@ -17,7 +17,7 @@ target 'GroopCam' do
   pod 'Stripe/ApplePay'
   pod 'Alamofire', '~> 4.5'
   pod "BSImagePicker"
-#  pod 'Stripe/ApplePay'
+  pod 'Stripe/ApplePay'
 
 end
 
