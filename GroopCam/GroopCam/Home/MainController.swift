@@ -101,6 +101,8 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     fileprivate func fetchGroupsWithUser(user: User){
 //        print(user.groups, "please")
+        
+        self.groups.removeAll()
         username = user.username
                 
         if user.groups.count == 0 {
