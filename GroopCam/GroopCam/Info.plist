@@ -50,6 +50,8 @@
 	<string>GroopCam would like access to your camera for to take pictures. Your camera won't be displayed without your permission.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>GroopCam would like access to your contacts to display friends that use the app. Your contacts won't be shared without your permission.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>GrropCam would like to access your photo library to take pictures.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

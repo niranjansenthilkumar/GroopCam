@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		366A977F24ACABEF00250A17 /* UIImageViewAligned.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366A977E24ACABEE00250A17 /* UIImageViewAligned.swift */; };
+		367600F0249E596C0087DF58 /* FirebaseFilesUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */; };
+		36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37624A3BAFB00E80786 /* CustomLayout.swift */; };
+		36F8E37924A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */; };
 		5E02EF184985C9C6404D8659 /* Pods_GroopCam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */; };
 		8A8D61D42409EF0900203016 /* StripeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D32409EF0900203016 /* StripeClient.swift */; };
 		8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D6240B247000203016 /* CheckoutViewController.swift */; };
@@ -64,6 +68,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		366A977E24ACABEE00250A17 /* UIImageViewAligned.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageViewAligned.swift; sourceTree = "<group>"; };
+		367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseFilesUpload.swift; sourceTree = "<group>"; };
+		36F8E37624A3BAFB00E80786 /* CustomLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLayout.swift; sourceTree = "<group>"; };
+		36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlignedCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		8A8D61D32409EF0900203016 /* StripeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeClient.swift; sourceTree = "<group>"; };
 		8A8D61D6240B247000203016 /* CheckoutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutViewController.swift; sourceTree = "<group>"; };
 		8A8D61D7240B247000203016 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -138,6 +146,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		367600EC249D155E0087DF58 /* Custom Classes */ = {
+			isa = PBXGroup;
+			children = (
+				367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */,
+				36F8E37624A3BAFB00E80786 /* CustomLayout.swift */,
+				36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */,
+				366A977E24ACABEE00250A17 /* UIImageViewAligned.swift */,
+			);
+			path = "Custom Classes";
+			sourceTree = "<group>";
+		};
 		8A8D61D5240B247000203016 /* StripeCheckout */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,6 +222,7 @@
 				8AD5774F23C724410072CDD7 /* Checkout */,
 				8AD5774523C5F0970072CDD7 /* Picture */,
 				8A8D61D5240B247000203016 /* StripeCheckout */,
+				367600EC249D155E0087DF58 /* Custom Classes */,
 				8AD5770B23C1E85B0072CDD7 /* Assets.xcassets */,
 				8AD5770D23C1E85B0072CDD7 /* LaunchScreen.storyboard */,
 				8AD5771023C1E85B0072CDD7 /* Info.plist */,
@@ -478,15 +498,19 @@
 				8AD5773A23C4CD610072CDD7 /* GroupRollController.swift in Sources */,
 				8AD5771A23C1E8770072CDD7 /* Theme.swift in Sources */,
 				8AD5771C23C1E8AA0072CDD7 /* PhoneVerificationController.swift in Sources */,
+				36F8E37924A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift in Sources */,
 				8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */,
+				366A977F24ACABEF00250A17 /* UIImageViewAligned.swift in Sources */,
 				8A8D61E9240B247000203016 /* MyAPIClient.swift in Sources */,
 				8A8D61F6240B247000203016 /* SettingsViewController.swift in Sources */,
 				8AD5774923C6EB010072CDD7 /* FriendCell.swift in Sources */,
 				8AD5772223C2596E0072CDD7 /* MainController.swift in Sources */,
+				36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */,
 				8AD5770523C1E8590072CDD7 /* SceneDelegate.swift in Sources */,
 				8A8D61EA240B247000203016 /* UIScrollView.swift in Sources */,
 				8A8D61ED240B247000203016 /* UIColor.swift in Sources */,
 				8A8D61F4240B247000203016 /* CheckoutRowView.swift in Sources */,
+				367600F0249E596C0087DF58 /* FirebaseFilesUpload.swift in Sources */,
 				8AD5773E23C4CE320072CDD7 /* CustomImageView.swift in Sources */,
 				8AD5772E23C3A1E90072CDD7 /* User.swift in Sources */,
 				8AD5771823C1E86D0072CDD7 /* Extensions.swift in Sources */,
@@ -650,9 +674,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UN8GMZ64UC;
+				DEVELOPMENT_TEAM = Q45FN4P4G5;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -663,14 +688,15 @@
 					STRIPE_ENABLE_APPLEPAY,
 				);
 				INFOPLIST_FILE = GroopCam/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam123;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
@@ -684,9 +710,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = UN8GMZ64UC;
+				DEVELOPMENT_TEAM = Q45FN4P4G5;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -697,14 +724,15 @@
 					STRIPE_ENABLE_APPLEPAY,
 				);
 				INFOPLIST_FILE = GroopCam/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam123;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;

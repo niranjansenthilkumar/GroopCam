@@ -28,7 +28,8 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     @objc func handleDismiss() {
         dismiss(animated: true, completion: nil)
 
-        NotificationCenter.default.post(name: CameraController.updateGroopFeedNotificationName, object: nil)
+        //Zubair - Performance optimization
+        //NotificationCenter.default.post(name: CameraController.updateGroopFeedNotificationName, object: nil)
 
     }
     
@@ -129,9 +130,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     @objc func handleCapturePhoto() {
         print("Capturing photo...")
-        
-        print(123)
-                
+                        
         UIView.animate(withDuration: 0.1, animations: {
             self.flashView.alpha = 1.0
         }, completion: { _ in
@@ -140,8 +139,12 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             })
         })
             
-        let settings = AVCapturePhotoSettings()
+        if let photoOutputConnection = output.connection(with: AVMediaType.video) {
+            photoOutputConnection.videoOrientation = getCurrentOrientation()
+        }
 
+        let settings = AVCapturePhotoSettings()
+        
         guard let previewFormatType = settings.availablePreviewPhotoPixelFormatTypes.first else { return }
 
         settings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewFormatType]
@@ -150,6 +153,37 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
 //        NotificationCenter.default.post(name: CameraController.updateGroopFeedNotificationName, object: nil)
 
+    }
+    
+    func getCurrentOrientation() -> AVCaptureVideoOrientation {
+        let currentDevice = UIDevice.current
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        
+        let deviceOrientation = currentDevice.orientation
+
+        var imageOrientation: AVCaptureVideoOrientation!
+
+        if deviceOrientation == .portrait {
+            imageOrientation = .portrait
+            print("Device: Portrait")
+        }else if (deviceOrientation == .landscapeLeft){
+            imageOrientation = .landscapeRight
+            print("Device: LandscapeLeft")
+        }else if (deviceOrientation == .landscapeRight){
+            imageOrientation = .landscapeLeft
+            print("Device LandscapeRight")
+        }else if (deviceOrientation == .portraitUpsideDown){
+            imageOrientation = .portraitUpsideDown
+            print("Device PortraitUpsideDown")
+        }else{
+            imageOrientation = .portrait
+        }
+        
+        return imageOrientation
+    }
+
+    override var shouldAutorotate: Bool {
+        return true
     }
     
     var username: String = ""
@@ -163,10 +197,14 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         guard let prevImage = UIImage(data: imageData!) else {return}
         let previm = prevImage.fixOrientation()
         
+        let isHorizongal = previm.size.width > previm.size.height
+        
+        getFormattedImageAndSave(prev: previm, isHorizontal: isHorizongal)
+        
+        /*
         var prev = UIImage()
         if devicePosition == "front" {
             prev = previm.withHorizontallyFlippedOrientation()
-//            prev = UIImage(cgImage: previm.cgImage!, scale: previm.scale, orientation: UIImage.Orientation.leftMirrored)
         }
         else{
             prev = previm
@@ -174,56 +212,28 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         guard let cgimage = prev.cgImage else {return}
         let originalCIImage = CIImage(cgImage: cgimage, options: [.applyOrientationProperty:true])
-//        guard let sepiaCIImage = sepiaFilter(originalCIImage, intensity:0.8) else {return}
+
         let sepiaCIImage = originalCIImage
 
         var previewImage = UIImage()
         previewImage = UIImage(ciImage: sepiaCIImage)
+        
         let containerView = UIView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
         containerView.backgroundColor = .white
+        
         let groopImage = UIImageView()
         containerView.addSubview(groopImage)
-        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 18, paddingLeft: 16, paddingBottom: 18, paddingRight: 16, width: 0, height: 0)
+        groopImage.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
         groopImage.contentMode = .scaleAspectFill
         groopImage.clipsToBounds = true
         groopImage.backgroundColor = .clear
         groopImage.image = previewImage
-        groopImage.layer.borderColor = UIColor.black.cgColor
-        groopImage.layer.borderWidth = 2
+        
         
         if devicePosition == "front" {
             groopImage.transform = CGAffineTransform(scaleX: -1, y: 1)
         }
         
-//        let groupLabel = UILabel().setupLabel(ofSize: 16, weight: UIFont.Weight.regular, textColor: .black, text: "slope day bb", textAlignment: .center)
-//        groupLabel.sizeToFit()
-//        containerView.addSubview(groupLabel)
-//        groupLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 7, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 20)
-//        groupLabel.text = group?.groupname ?? ""
-//
-//        let dateLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: .black, text: "04/01/20", textAlignment: .left)
-//        dateLabel.sizeToFit()
-//        containerView.addSubview(dateLabel)
-//        dateLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: 0, paddingBottom: -1, paddingRight: 0, width: 0, height: 20)
-//        let date = Date(timeIntervalSince1970: Date().timeIntervalSince1970)
-        
-//        dateLabel.text = Date(timeIntervalSince1970: Date().timeIntervalSince1970).asString(style: .short)
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//        let dateString = dateFormatter.string(from: date)
-//        
-//        dateLabel.text = dateString
-//        dateLabel.setCharacterSpacing(-0.4)
-
-
-        
-//        dateLabel.text = Date(timeIntervalSince1970: Date().timeIntervalSince1970).asString(style: .long)
-//
-//        let usernameLabel = UILabel().setupLabel(ofSize: 16, weight: UIFont.Weight.regular, textColor: .black, text: "slope day bb", textAlignment: .center)
-//        usernameLabel.sizeToFit()
-//        containerView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 20)
-//        usernameLabel.text = "taken by: " + username
         
         let groopCamLabel = UILabel().setupLabel(ofSize: 10, weight: UIFont.Weight.regular, textColor: Theme.black, text: "", textAlignment: .right)
         groopCamLabel.sizeToFit()
@@ -234,33 +244,10 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         containerView.layer.masksToBounds = false
         containerView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
 
-//        containerView.groopImage.contentMode = .scaleAspectFill
-//        containerView.groopImage.clipsToBounds = true
-//        containerView.groopImage.image = previewImage
-//        containerView.groupNameLabel.text = group?.groupname ?? ""
-//        containerView.usernameLabel.text = "taken by " + username
-//        containerView.dateLabel.text = Date(timeIntervalSince1970: Date().timeIntervalSince1970).asString(style: .long)
-        
-//        let iv = UIImageView(image: containerView.image)
-                        
-//        view.addSubview(containerView.photoImageView.asim)
-//        let image = containerView.getImage()
-        
-//        let iv = UIImageView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
-//        iv.image = containerView.asImage()
-//        view.addSubview(containerView)
-        
-//        let v = UIImageView(frame: CGRect(x: 0, y: 44, width: view.frame.width, height: view.frame.width * 1.561))
-//        v.image = imageWithView(view: containerView)
-//            //        view.addSubview(UIImageView(image: containerView.asImage()))
-//        view.addSubview(v)
-        
-//        view.addSubview(containerView)
         
         guard let image = imageWithView(view: containerView) else {return}
-        
-//        handleSave(image: previewImage)
-        handleSave(image: image)
+        handleSave(image: image, isHorizontal: isHorizongal)
+ */
         
     }
     
@@ -273,7 +260,21 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     var selectedImage: UIImage?
     
-    func handleSave(image: UIImage){
+    func getFormattedImageAndSave(prev: UIImage, isHorizontal: Bool) {
+        //var prev = UIImage()
+        let imageView = UIImageView(image: prev)
+        imageView.contentMode = .scaleAspectFit
+
+        imageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+
+        //This is where the image size changes from it's original size. Need to handle this thing.
+        
+        let image = Image(image: imageView.image!, isHorizontal: isHorizontal)
+
+        handleSave(image: image)
+        
+    }
+    func handleSave(image: Image, isHorizontal: Bool = false){
         
         print(123, "please")
         
@@ -293,10 +294,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         print(256, "please")
         
-        
-
-        
-        guard let uploadData = image.jpegData(compressionQuality: 0.5) else { return }
+        guard let uploadData = image.image.jpegData(compressionQuality: 0.5) else { return }
         
         let picId = NSUUID().uuidString
         
@@ -318,23 +316,22 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
                 
                 print("successfully fetched url")
                 
-                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image, picId: picId)
-                
+                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl, userID: uid, groupID: groupId, groupName: groupName, image: image.image, picId: picId, isHorizontal: image.isHorizontal)
                 
             }
         }
     }
     
-    fileprivate func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String) {
+    fileprivate func saveToDatabaseWithImageUrl(imageUrl: String, userID: String, groupID: String, groupName: String, image: UIImage, picId: String, isHorizontal: Bool) {
         let postImage = image
 
 //        let picId = NSUUID().uuidString
                 
-        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID] as [String : Any]
+        let values = ["imageUrl": imageUrl, "groupname": groupName, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": String(Date().timeIntervalSince1970), "userid": userID, "isHorizontal": isHorizontal] as [String : Any]
         
         let picValues = [picId: values]
         
-    Database.database().reference().child("posts").child(groupID).updateChildValues(picValues) { (err, ref) in
+        Database.database().reference().child("posts").child(groupID).updateChildValues(picValues) { (err, ref) in
             if let err = err {
                 print("Failed to save image to DB", err)
                 return
@@ -343,10 +340,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             print("Successfully saved to post to DB")
         
         }
-        
-        
-        
-        Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
+    Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
     
     }
     
@@ -356,6 +350,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     let previewLayer = AVCaptureVideoPreviewLayer()
     
     let output = AVCapturePhotoOutput()
+    
     fileprivate func setupCaptureSession() {
 //        let captureSession = AVCaptureSession()
         

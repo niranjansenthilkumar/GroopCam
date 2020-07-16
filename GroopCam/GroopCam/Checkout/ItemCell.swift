@@ -13,11 +13,13 @@ class QuantityObject {
     var quantity: Int
     var printableObject: PrintableObject
     var image: UIImage
+    var isHorizontal: Bool
 
-    init(quantity: Int, printableObject: PrintableObject, image: UIImage) {
+    init(quantity: Int, printableObject: PrintableObject, image: UIImage, isHorizontal: Bool) {
         self.quantity = quantity
         self.printableObject = printableObject
         self.image = image
+        self.isHorizontal = isHorizontal
     }
 }
 
@@ -29,18 +31,22 @@ protocol ItemCellDelegate {
 class ItemCell: UICollectionViewCell {
     
     var delegate: ItemCellDelegate?
-        
+            
     let photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
-        iv.backgroundColor = .white
+        iv.contentMode = .scaleAspectFit
+        //iv.clipsToBounds = true
+        iv.backgroundColor = .clear
         return iv
     }()
-//
-//    let photoImageView: UIImageView = {
-//        let iv = UIImageView()
-//        iv.backgroundColor = .yellow
+    
+    
+//    let photoImageView: UIImageViewAligned = {
+//        let iv = UIImageViewAligned()
+//        iv.alignLeft = true
+//        iv.contentMode = .scaleAspectFit
+//        //iv.clipsToBounds = true
+//        iv.backgroundColor = .white
 //        return iv
 //    }()
     
@@ -104,24 +110,11 @@ class ItemCell: UICollectionViewCell {
 //        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(gesture:)))
 //        tap.require(toFail: longPress)
 //        button.addGestureRecognizer(tap)
-
         
         button.addTarget(self, action: #selector(handleIncrease), for: .touchUpInside)
         return button
     }()
 //    
-//    @objc func handleTap(gesture: UITapGestureRecognizer) {
-//        print("Handling increase in cell...")
-//        delegate?.didIncrease(for: self)
-//    }
-
-//    @objc func handleLongPress(gesture: UILongPressGestureRecognizer) {
-//
-//        gesture.minimumPressDuration = 1.0
-//        if gesture.state == .began {
-//            delegate?.didIncrease(for: self)
-//        }
-//    }
 
     @objc func handleIncrease(){
         print("Handling increase in cell...")
@@ -149,36 +142,16 @@ class ItemCell: UICollectionViewCell {
         
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        
-        backgroundColor = Theme.cellColor
+    
+        //backgroundColor = Theme.cellColor
+        //clipsToBounds = true
+        backgroundColor = .clear
         
         addSubview(photoImageView)
-
-        photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 150)
-
-        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-
+ 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        photoImageView.layer.masksToBounds = false
-//
-//        photoImageView.addSubview(groopImage)
-//        groopImage.anchor(top: photoImageView.topAnchor, left: photoImageView.leftAnchor, bottom: photoImageView.bottomAnchor, right: photoImageView.rightAnchor, paddingTop: 9, paddingLeft: 6, paddingBottom: 23, paddingRight: 6, width: 87.88, height: 117.05)
-//
-//        photoImageView.addSubview(groupNameLabel)
-//        groupNameLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 1, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(dateLabel)
-//        dateLabel.anchor(top: groupNameLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 1, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 6)
-//
-//        photoImageView.addSubview(groopCamLabel)
-//        groopCamLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: -1, paddingBottom: 2, paddingRight: 0, width: 200, height: 6)
-        
-        photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        
+        //photoImageView.layer.masksToBounds = false
+
         addSubview(quantityView)
         quantityView.anchor(top: nil, left: nil, bottom: nil, right: rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 26, width: 100, height: 25)
         
@@ -186,7 +159,32 @@ class ItemCell: UICollectionViewCell {
                     
         setupQuantityView()
     }
+        
+    func showVerticalImage() {
+        removeExistingConstraints()
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+        photoImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 23, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 100, height: 0)
+        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        //print("Photo ImageView Frame is: \(photoImageView.frame)")
+        
+    }
     
+    func showHorizontalImage() {
+        removeExistingConstraints()
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+        photoImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        photoImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12).isActive = true
+        photoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 23).isActive = true
+        photoImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
+        
+        //print("Photo ImageView Frame is: \(photoImageView.frame)")
+    }
+        
+    func removeExistingConstraints() {
+        for constraint in photoImageView.constraints {
+            photoImageView.removeConstraint(constraint)
+        }
+    }
     func setupQuantityView(){
         let stackView = UIStackView(arrangedSubviews: [decreaseButton, quantity, increaseButton])
     

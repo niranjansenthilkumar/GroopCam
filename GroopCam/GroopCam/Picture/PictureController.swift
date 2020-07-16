@@ -19,9 +19,9 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     
     let photoImageView: CustomImageView = {
         let iv = CustomImageView()
-        iv.contentMode = .scaleAspectFill
+        iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
-        iv.backgroundColor = .white
+        iv.backgroundColor = .clear
         return iv
     }()
     
@@ -71,35 +71,40 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
                 
         view.addSubview(photoImageView)
-        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
-        
-        photoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
 
         photoImageView.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
-        photoImageView.layer.masksToBounds = false
-
+        //photoImageView.layer.masksToBounds = false
         photoImageView.layer.shouldRasterize = false
 
-//        photoImageView.addSubview(groopImage)
-//        groopImage.anchor(top: photoImageView.topAnchor, left: photoImageView.leftAnchor, bottom: photoImageView.bottomAnchor, right: photoImageView.rightAnchor, paddingTop: 32, paddingLeft: 20, paddingBottom: 72, paddingRight: 20, width: 0, height: 0)
-//
-//        photoImageView.addSubview(groupNameLabel)
-//        groupNameLabel.anchor(top: groopImage.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(dateLabel)
-//        dateLabel.anchor(top: groupNameLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(usernameLabel)
-//        usernameLabel.anchor(top: dateLabel.bottomAnchor, left: groopImage.leftAnchor, bottom: nil, right: groopImage.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 16)
-//
-//        photoImageView.addSubview(groopCamLabel)
-//        groopCamLabel.anchor(top: nil, left: groopImage.leftAnchor, bottom: groopImage.topAnchor, right: nil, paddingTop: 0, paddingLeft: -1, paddingBottom: 4, paddingRight: 0, width: 300, height: 16)
-
+        if let isHorizontal = picture?.isHorizontal {
+            if isHorizontal {
+                showHorizontalImage()
+            }
+            else {
+                showVerticalImage()
+            }
+        }
+        else {
+            showVerticalImage()
+        }
+        
     }
     
     static let updatePictureNotificationName = NSNotification.Name(rawValue: "UpdatePictureFeed")
     
+    func showVerticalImage() {
+        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
+
+        photoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    }
+    
+    func showHorizontalImage() {
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+        photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
+        photoImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12).isActive = true
+        photoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+
     @objc func toggleSettings(){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -147,7 +152,6 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
                 
                 NotificationCenter.default.post(name: PictureController.updatePictureNotificationName, object: nil)
 
-                
                 self.navigationController?.popViewController(animated: true)
             }
             

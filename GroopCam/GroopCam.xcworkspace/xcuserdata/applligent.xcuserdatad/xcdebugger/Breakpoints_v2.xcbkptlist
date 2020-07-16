@@ -64,7 +64,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "338"
             endingLineNumber = "338"
-            landmarkName = "collectionView(_:didDeselectItemAt:)"
+            landmarkName = "fetchPostsWithGroupID(groupID:isInitialLoad:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -80,7 +80,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "345"
             endingLineNumber = "345"
-            landmarkName = "collectionView(_:didDeselectItemAt:)"
+            landmarkName = "fetchPostsWithGroupID(groupID:isInitialLoad:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -127,7 +127,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "676"
-            endingLineNumber = "676">
+            endingLineNumber = "676"
+            landmarkName = "handleActualPrintPhotos()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -141,7 +143,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "676"
-            endingLineNumber = "676">
+            endingLineNumber = "676"
+            landmarkName = "handleActualPrintPhotos()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -155,7 +159,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "676"
-            endingLineNumber = "676">
+            endingLineNumber = "676"
+            landmarkName = "handleActualPrintPhotos()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

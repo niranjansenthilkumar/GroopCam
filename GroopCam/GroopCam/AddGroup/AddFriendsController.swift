@@ -22,7 +22,11 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        layoutViews()
+        if #available(iOS 13.0, *) {
+            layoutViews()
+        } else {
+            // Fallback on earlier versions
+        }
         
         fetchContacts()
         
@@ -314,11 +318,15 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         self.searchController.searchBar.tintColor = UIColor.white
                 
         searchController.searchBar.barTintColor = Theme.backgroundColor
-        searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
-        
-        searchController.searchBar.searchTextField.placeholder = "Search by username"
-        searchController.searchBar.searchTextField.textColor = Theme.lgColor
+        if #available(iOS 13.0, *) {
+            searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
+            searchController.searchBar.searchTextField.placeholder = "Search by username"
+            searchController.searchBar.searchTextField.textColor = Theme.lgColor
 
+        } else {
+            // Fallback on earlier versions
+        }
+        
         if let textFieldInsideSearchBar = searchController.searchBar.value(forKey: "searchField") as? UITextField,
             let glassIconView = textFieldInsideSearchBar.leftView as? UIImageView {
                 //Magnifying glass

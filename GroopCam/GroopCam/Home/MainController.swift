@@ -19,11 +19,9 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     override func viewDidLoad() {
         super.viewDidLoad()
         
-                
         collectionView?.register(GroupCell.self, forCellWithReuseIdentifier: cellId)
-        
         layoutViews()
-        
+
         if Auth.auth().currentUser == nil {
             //show if not logged in
             DispatchQueue.main.async {
@@ -37,12 +35,9 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 navController.modalPresentationStyle = .fullScreen
                 self.present(navController, animated: true, completion: nil)
             }
-            
             return
         }
-        
-//        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: AddFriendsController.updateFeedNotificationName, object: nil)
-        
+                
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: FriendsController.updateFriendNotificationName, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: UpdateFriendsController.updateAddFriendNotificationName, object: nil)
@@ -55,8 +50,8 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         collectionView?.refreshControl = refreshControl
 
-        fetchAllGroups()
-        
+        //Z: Fix for groups not getting loaded initially
+        //fetchAllGroups()
     }
     
     var bool: Bool = false
@@ -66,11 +61,12 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
             NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: AddFriendsController.updateFeedNotificationName, object: nil)
             bool = true
         }
-        
-        
     }
     
-    
+    //Z: Fix for groups not getting loaded initially
+    override func viewWillAppear(_ animated: Bool) {
+        fetchAllGroups()
+    }
     
     @objc func handleUpdateFeed() {
         handleRefresh()
@@ -86,7 +82,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     var groups = [Group]()
     fileprivate func fetchAllGroups(){
         fetchGroups()
-        self.collectionView.reloadData()
+        //self.collectionView.reloadData()
     }
     
     func fetchGroups(){
@@ -105,13 +101,20 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     fileprivate func fetchGroupsWithUser(user: User){
 //        print(user.groups, "please")
+        
+        self.groups.removeAll()
         username = user.username
                 
         if user.groups.count == 0 {
             self.removeSpinner()
-            self.collectionView.reloadData()
+            //self.collectionView.reloadData()
+            
+            //Z: Fix for groups not getting loaded initially
+            self.collectionView.setEmptyMessage("No group rolls yet! 😔 click new group to start a roll. 📸")
             return
         }
+        
+        
 
         for group in user.groups {
 //            print(group, "please")
@@ -135,10 +138,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 }
                 
             Database.database().reference().child("members").child(group.key).observeSingleEvent(of: .value) { (snapshot) in
-    //                print(snapshot.value, "please")
-                    
-//                    self.collectionView?.refreshControl?.endRefreshing()
-
                     if let value = snapshot.value as? [String: Any] {
                         print(value.count, "please")
                         let group = Group(groupid: group.key, groupname: groupInfo[0] as! String, lastPicture: groupInfo[1] as! String, creationDate: groupInfo[2] as! String, members: value, pics: [])
@@ -177,19 +176,22 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         return interval
     }
     
+    //Z: Fix for groups not getting loaded initially
+//    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//
+//        if (self.groups.count == 0) {
+//            self.collectionView.setEmptyMessage("No group rolls yet! 😔 click new group to start a roll. 📸")
+//        } else {
+//            self.collectionView.restore()
+//        }
+//
+//        return self.groups.count
+//    }
+    
+    //Z: Fix for groups not getting loaded initially
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
-        if (self.groups.count == 0) {
-            self.collectionView.setEmptyMessage("No group rolls yet! 😔 click new group to start a roll. 📸")
-        } else {
-            self.collectionView.restore()
-        }
-        
         return self.groups.count
-
-        
     }
-
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
@@ -264,15 +266,11 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         })    }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-
-        
         let groupRollVC = GroupRollController(collectionViewLayout: UICollectionViewFlowLayout())
         groupRollVC.group = self.groups[indexPath.row]
-        
-//        cameraController.username = self.username
         groupRollVC.username = self.username
-        
         groupRollVC.groupCount = self.groups[indexPath.row].members.count
+        
         self.navigationController?.pushNavBarWithTitle(vc: groupRollVC)
         
         self.navigationItem.leftItemsSupplementBackButton = true
