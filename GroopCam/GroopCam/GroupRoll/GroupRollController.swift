@@ -758,6 +758,11 @@ class GroupRollController: UICollectionViewController {
     @objc func openGallery() {
         let imagePicker = ImagePickerController()
         
+        let options = PHImageRequestOptions()
+        options.deliveryMode = PHImageRequestOptionsDeliveryMode.highQualityFormat
+        options.isSynchronous = false
+        options.isNetworkAccessAllowed = true
+
         presentImagePicker(imagePicker, select: { (asset) in
             // User selected an asset. Do something with it. Perhaps begin processing/upload?
             print("User selected an asset")
@@ -779,33 +784,30 @@ class GroupRollController: UICollectionViewController {
             //Upload all the images on firebase storage
             print("Number of assets: \(assets.count)")
             self.progress.totalUnitCount = Int64(assets.count)
-            //self.showActivityIndicator()
+            self.showActivityIndicator()
             for asset in assets {
                 self.assetCount = assets.count
                 print("Asset is: \(asset)")
                 // Request the maximum size. If you only need a smaller size make sure to request that instead.
-                PHImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .default, options: nil) { (image, info) in
+                PHImageManager.default().requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: .default, options: options) { (image, info) in
                     // Do something with image
 
+                    self.hideActivityIndicator()
                     guard let dictInfo = info as? [String:Any] else {
-                        self.hideActivityIndicator()
                         return
                     }
                     
                     guard let isDegraded = dictInfo["PHImageResultIsDegradedKey"] as? Bool else {
-                        self.hideActivityIndicator()
                         print("isDegraded not found")
                         return
                     }
                                         
                     guard !isDegraded else {
-                        self.hideActivityIndicator()
                         print("isDegraded is true")
                         return
                     }
                     
                     guard let fetchedImage = image else {
-                        self.hideActivityIndicator()
                         print("NO IMAGE FOUND")
                         return
                     }
