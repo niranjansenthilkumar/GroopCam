@@ -12,6 +12,7 @@ import Photos
 import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
+import CoreMotion
 
 class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewControllerTransitioningDelegate {
     
@@ -58,6 +59,12 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         return view
     }()
     
+    var orientationLast = UIInterfaceOrientation(rawValue: 0)!
+    var motionManager: CMMotionManager?
+
+    let customAnimationPresentor = CustomAnimationPresentor()
+    let customAnimationDismisser = CustomAnimationDismisser()
+
     @objc func handleSelfie(){
         print(123)
         switchCameraTapped(sender: (Any).self)
@@ -86,10 +93,13 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         setupCaptureSession()
         setupHUD()
+        setUpCoreMotion()
     }
     
-    let customAnimationPresentor = CustomAnimationPresentor()
-    let customAnimationDismisser = CustomAnimationDismisser()
+    override func viewWillDisappear(_ animated: Bool) {
+        motionManager?.stopAccelerometerUpdates()
+    }
+    
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         
@@ -120,6 +130,52 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         flashButton.centerYAnchor.constraint(equalTo: capturePhotoButton.centerYAnchor).isActive = true
     }
     
+    private func setUpCoreMotion() {
+        motionManager = CMMotionManager()
+        motionManager?.accelerometerUpdateInterval = 0.2
+        motionManager?.gyroUpdateInterval = 0.2
+        motionManager?.startAccelerometerUpdates(to: (OperationQueue.current)!, withHandler: {
+            (accelerometerData, error) -> Void in
+            if error == nil {
+                self.outputAccelertionData((accelerometerData?.acceleration)!)
+            }
+            else {
+                print("\(error!)")
+            }
+        })
+    }
+    
+     private func outputAccelertionData(_ acceleration: CMAcceleration) {
+        var orientationNew: UIInterfaceOrientation
+        if acceleration.x >= 0.75 {
+            orientationNew = .landscapeLeft
+            //print("landscapeLeft")
+        }
+        else if acceleration.x <= -0.75 {
+            orientationNew = .landscapeRight
+            //print("landscapeRight")
+        }
+        else if acceleration.y <= -0.75 {
+            orientationNew = .portrait
+            //print("portrait")
+
+        }
+        else if acceleration.y >= 0.75 {
+            orientationNew = .portraitUpsideDown
+            //print("portraitUpsideDown")
+        }
+        else {
+            // Consider same as last time
+            return
+        }
+
+        if orientationNew == orientationLast {
+            return
+        }
+        
+        orientationLast = orientationNew
+    }
+
     func sepiaFilter(_ input: CIImage, intensity: Double) -> CIImage?
     {
         let sepiaFilter = CIFilter(name:"CISepiaTone")
@@ -155,22 +211,51 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
 
     }
     
+    
+    //Z: Changed to fix the issue when images are picked in landscape with orientation lock
+//    func getCurrentOrientation() -> AVCaptureVideoOrientation {
+//        let currentDevice = UIDevice.current
+//        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+//
+//        let deviceOrientation = currentDevice.orientation
+//
+//        var imageOrientation: AVCaptureVideoOrientation!
+//
+//        if deviceOrientation == .portrait {
+//            imageOrientation = .portrait
+//            print("Device: Portrait")
+//        }else if (deviceOrientation == .landscapeLeft){
+//            imageOrientation = .landscapeRight
+//            print("Device: LandscapeLeft")
+//        }else if (deviceOrientation == .landscapeRight){
+//            imageOrientation = .landscapeLeft
+//            print("Device LandscapeRight")
+//        }else if (deviceOrientation == .portraitUpsideDown){
+//            imageOrientation = .portraitUpsideDown
+//            print("Device PortraitUpsideDown")
+//        }else{
+//            imageOrientation = .portrait
+//        }
+//
+//        return imageOrientation
+//    }
+
     func getCurrentOrientation() -> AVCaptureVideoOrientation {
         let currentDevice = UIDevice.current
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
         
-        let deviceOrientation = currentDevice.orientation
-
+        let deviceOrientation = orientationLast
+        
         var imageOrientation: AVCaptureVideoOrientation!
 
         if deviceOrientation == .portrait {
             imageOrientation = .portrait
             print("Device: Portrait")
         }else if (deviceOrientation == .landscapeLeft){
-            imageOrientation = .landscapeRight
+            imageOrientation = .landscapeLeft
             print("Device: LandscapeLeft")
         }else if (deviceOrientation == .landscapeRight){
-            imageOrientation = .landscapeLeft
+            imageOrientation = .landscapeRight
             print("Device LandscapeRight")
         }else if (deviceOrientation == .portraitUpsideDown){
             imageOrientation = .portraitUpsideDown
@@ -181,7 +266,6 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         return imageOrientation
     }
-
     override var shouldAutorotate: Bool {
         return true
     }
