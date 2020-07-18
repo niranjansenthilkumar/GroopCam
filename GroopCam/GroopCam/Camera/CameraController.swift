@@ -186,6 +186,11 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         return true
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        print("viewWillTransitionCalled")
+    }
+    
     var username: String = ""
     
     static let updateGroopFeedNotificationName = NSNotification.Name(rawValue: "UpdateGroopFeed")

@@ -208,22 +208,25 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupCell
         
-        let group = self.groups[indexPath.row]
-        
-        cell.label.text = group.groupname
-                
-        
-        let timeString = parseDuration(group.lastPicture)
-        let date = Date(timeIntervalSince1970: parseDuration(group.lastPicture))
-        
-        
-        cell.recentLabel.text = "Active " + date.timeAgoDisplay()
-        cell.groupNumberLabel.text = String(group.members.count)
-        cell.cameraButton.tag = indexPath.row
-        cell.cameraButton.addTarget(self, action: #selector(handleCamera(sender:)), for: .touchUpInside)
-        
-        cell.optionsButton.tag = indexPath.row
-        cell.optionsButton.addTarget(self, action: #selector(handleDelete(sender:)), for: .touchUpInside)
+        if indexPath.row <= groups.count {
+            let group = self.groups[indexPath.row]
+            
+            cell.label.text = group.groupname
+                    
+            
+            let timeString = parseDuration(group.lastPicture)
+            let date = Date(timeIntervalSince1970: parseDuration(group.lastPicture))
+            
+            
+            cell.recentLabel.text = "Active " + date.timeAgoDisplay()
+            cell.groupNumberLabel.text = String(group.members.count)
+            cell.cameraButton.tag = indexPath.row
+            cell.cameraButton.addTarget(self, action: #selector(handleCamera(sender:)), for: .touchUpInside)
+            
+            cell.optionsButton.tag = indexPath.row
+            cell.optionsButton.addTarget(self, action: #selector(handleDelete(sender:)), for: .touchUpInside)
+
+        }
         
         return cell
     }
