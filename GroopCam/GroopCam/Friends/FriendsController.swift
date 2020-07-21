@@ -41,12 +41,19 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
     
         self.friendToDisplay.removeAll()
         fetchMembers()
+        self.tableView?.refreshControl?.endRefreshing()
         
     }
     
     var friendToDisplay = [FriendToDisplay]()
     
-    
+    func sortAlphabetical(friend: FriendToDisplay) {
+            var index = 0
+        while index != self.friendToDisplay.count && friend.username.lowercased() > self.friendToDisplay[index].username.lowercased() {
+                index+=1
+            }
+            self.friendToDisplay.insert(friend, at: index)
+    }
     
     func fetchMembers(){
         guard let members = self.group?.members else {return}
@@ -67,7 +74,15 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
 //                        print(usernameToAdd, "please")
 //                        print(phoneNumberToAdd, "please")
                         
-                        self.friendToDisplay.append(friend)
+                        // START Test alphabetical sort
+                        // let f1 = FriendToDisplay(phonenumber: "+13056784456", username: "123Barty")
+                        // let f2 = FriendToDisplay(phonenumber: "+13056783456", username: "aania")
+                        
+                        // self.sortAlphabetical(friend: f1)
+                        // self.sortAlphabetical(friend: f2)
+                        // END Test alphabetical sort
+                        
+                        self.sortAlphabetical(friend: friend)
                         self.tableView.reloadData()
                         self.contactsToNotAdd.append(phoneNumberToAdd)
                     }
