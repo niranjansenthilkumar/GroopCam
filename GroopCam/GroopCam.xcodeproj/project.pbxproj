@@ -813,7 +813,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D7DC9676F3A1D2A406E8BA34 /* Pods-GroopCam.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -848,7 +848,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 944D472F9EF9E5A41A141F24 /* Pods-GroopCam.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GroopCam/GroopCam.entitlements;
 				CODE_SIGN_STYLE = Automatic;
