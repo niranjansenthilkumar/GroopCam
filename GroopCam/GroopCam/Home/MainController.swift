@@ -5,7 +5,6 @@
 //  Created by Niranjan Senthilkumar on 1/5/20.
 //  Copyright © 2020 NJ. All rights reserved.
 //
-
 import UIKit
 import Firebase
 import FirebaseAuth
@@ -63,10 +62,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    //Z: Fix for groups not getting loaded initially
-    override func viewWillAppear(_ animated: Bool) {
-        fetchAllGroups()
-    }
     
     @objc func handleUpdateFeed() {
         handleRefresh()
@@ -122,7 +117,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //            print(group.key, "please")
             Database.database().reference().child("groups").child(group.key).observeSingleEvent(of: .value) { (snapshot) in
 //                print(snapshot.value, "please")
-
                 if let value = snapshot.value as? [String: Any] {
                     guard let indgroupName = value["groupname"] else {return}
                     guard let indlastPicture = value["lastPicture"] else {return}
@@ -234,6 +228,25 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     @objc func handleDelete(sender: UIButton){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .default , handler:{ (UIAlertAction)in
+                   print("User click edit group button")
+        
+                   let data = self.groups[sender.tag]
+                   let groupId = data.groupid
+                   let lastPic = data.lastPicture
+                   let timeStamp = data.creationDate
+           
+                   let editGroupVC = EditGroupController()
+                   editGroupVC.groupId = groupId
+                   editGroupVC.lastPic = lastPic
+                   editGroupVC.timeStamp = timeStamp
+                   self.navigationController?.pushNavBar(vc: editGroupVC)
+                          
+                   self.navigationItem.leftItemsSupplementBackButton = true
+                   self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+                   
+               }))
                 
         alert.addAction(UIAlertAction(title: "Leave Group", style: .destructive , handler:{ (UIAlertAction)in
             print("User click leave button")

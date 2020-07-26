@@ -106,6 +106,8 @@ class GroupRollController: UICollectionViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: PictureController.updatePictureNotificationName, object: nil)
         
+           NotificationCenter.default.addObserver(self, selector: #selector(updateGroupNameFunc(notification:)), name: EditGroupController.updateGroupName, object: nil)
+        
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
@@ -232,9 +234,15 @@ class GroupRollController: UICollectionViewController {
         if self.posts.count == 0 && self.objects.count == 0 {
             self.removeSpinner()
             self.collectionView.reloadData()
+            self.collectionView?.refreshControl?.endRefreshing()
             return
         }
     }
+    
+    @objc func updateGroupNameFunc(notification: NSNotification) {
+        self.navigationItem.title = notification.userInfo?["groupName"] as? String
+          }
+    
     
 //    func getAllPosts() {
 //        //print("getAllPosts() called")
@@ -483,8 +491,14 @@ class GroupRollController: UICollectionViewController {
             pictureVC.picture = post
             pictureVC.groupId = self.group?.groupid
             
-//            pictureVC.usernameLabel.text = "taken by: " + post.user.username
-//            pictureVC.dateLabel.text = Date(timeIntervalSince1970: post.creationDate).asString(style: .long)
+            pictureVC.usernameLabel.text = "taken by: @" + post.user.username
+            let picDate = Date(timeIntervalSince1970: post.creationDate)
+            let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: NSLocale.current.identifier)
+            dateFormatter.setLocalizedDateFormatFromTemplate("yyyy-MM-dd")
+            pictureVC.dateLabel.text = "date: " + dateFormatter.string(from: picDate)
+
+            
             self.navigationController?.navigationBar.isHidden = false
             self.navigationItem.leftItemsSupplementBackButton = true
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)

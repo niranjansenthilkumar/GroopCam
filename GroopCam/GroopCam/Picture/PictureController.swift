@@ -46,13 +46,13 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
     }()
     
     var dateLabel: UILabel = {
-        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .black, text: "December 26th, 2019", textAlignment: .center)
+        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .white, text: "", textAlignment: .center)
         label.sizeToFit()
         return label
      }()
     
     var usernameLabel: UILabel = {
-        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .black, text: "taken by: njkumarr", textAlignment: .center)
+        let label = UILabel().setupLabel(ofSize: 14, weight: UIFont.Weight.medium, textColor: .white, text: "", textAlignment: .center)
         label.sizeToFit()
         return label
     }()
@@ -68,7 +68,11 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         
         view.backgroundColor = Theme.backgroundColor
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
+        let uploadButton = UIBarButtonItem(image: UIImage(named: "shareicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(shareAction))
+
+        let deleteButton = UIBarButtonItem(image: UIImage(named: "deleteicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(deleteAction))
+
+        self.navigationItem.rightBarButtonItems = [deleteButton, uploadButton]
                 
         view.addSubview(photoImageView)
 
@@ -88,12 +92,18 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
             showVerticalImage()
         }
         
+        view.addSubview(usernameLabel)
+        usernameLabel.anchor(top: photoImageView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 15, paddingLeft: 0, paddingBottom: 5, paddingRight: 0, width: 0, height: 16)
+        
+        view.addSubview(dateLabel)
+        dateLabel.anchor(top: usernameLabel.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 2, paddingLeft: 0, paddingBottom: 2, paddingRight: 0, width: 0, height: 16)
+
     }
     
     static let updatePictureNotificationName = NSNotification.Name(rawValue: "UpdatePictureFeed")
     
     func showVerticalImage() {
-        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 50, paddingLeft: 24, paddingBottom: 182, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
+        photoImageView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 15, paddingLeft: 24, paddingBottom: 15, paddingRight: 24, width: 0, height: 1.5*view.frame.width - 48)
 
         photoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
@@ -103,11 +113,66 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         photoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
         photoImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12).isActive = true
         photoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        photoImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -75).isActive = true
     }
+    
+    @objc func deleteAction(){
 
-    @objc func toggleSettings(){
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive , handler:{ (UIAlertAction)in
+        print("User click Delete button")
+
+        guard let pictureId = self.picture?.id else {return}
+
+        let storageRef = Storage.storage().reference().child("posts").child(pictureId)
+
+        storageRef.delete { (err) in
+            if let err = err {
+                print("failed to delete image")
+
+            }
+
+           guard let groupId = self.groupId else {return}
+
+           Database.database().reference().child("posts").child(groupId).child(pictureId).removeValue()
+
+           print("successfully deleted image")
+
+           NotificationCenter.default.post(name: PictureController.updatePictureNotificationName, object: nil)
+
+    
+            self.navigationController?.popViewController(animated: true)
+        }
+
+        }))
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
+                print("User click Dismiss button")
+
+        }))
+
+        self.present(alert, animated: true, completion: {
+                       print("completion block")
+         })
+
+         }
+
+
+    @objc func shareAction(){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Share", style: .default , handler:{ (UIAlertAction)in
+                      print("User click Share Ext button")
+
+                  let imageData = self.photoImageView.asImage().jpegData(compressionQuality: 0.5)
+                 let shareExtVC = UIActivityViewController(activityItems: [imageData!], applicationActivities: [])
+                 self.present(shareExtVC, animated: true)
+
+               }))
+        
+        /*
                         
         alert.addAction(UIAlertAction(title: "Share", style: .default , handler:{ (UIAlertAction)in
             print("User click Share button")
@@ -131,31 +196,7 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
             
         }))
 
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive , handler:{ (UIAlertAction)in
-            print("User click Delete button")
-            
-            guard let pictureId = self.picture?.id else {return}
-            
-            let storageRef = Storage.storage().reference().child("posts").child(pictureId)
-            
-            storageRef.delete { (err) in
-                if let err = err {
-                    print("failed to delete image")
-                    
-                }
-                
-                guard let groupId = self.groupId else {return}
-                
-                Database.database().reference().child("posts").child(groupId).child(pictureId).removeValue()
-
-                print("successfully deleted image")
-                
-                NotificationCenter.default.post(name: PictureController.updatePictureNotificationName, object: nil)
-
-                self.navigationController?.popViewController(animated: true)
-            }
-            
-        }))
+        */
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
             print("User click Dismiss button")

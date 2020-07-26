@@ -42,12 +42,18 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
     
         self.friendToDisplay.removeAll()
         fetchMembers()
-        
+        self.tableView?.refreshControl?.endRefreshing()
     }
     
     var friendToDisplay = [FriendToDisplay]()
     
-    
+    func sortAlphabetical(friend: FriendToDisplay) {
+                var index = 0
+            while index != self.friendToDisplay.count && friend.username.lowercased() > self.friendToDisplay[index].username.lowercased() {
+                    index+=1
+                }
+                self.friendToDisplay.insert(friend, at: index)
+        }
     
     func fetchMembers(){
         guard let members = self.group?.members else {return}
@@ -65,10 +71,20 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
                         
                         let friend = FriendToDisplay(phonenumber: phoneNumberToAdd, username: usernameToAdd)
                         
-//                        print(usernameToAdd, "please")
-//                        print(phoneNumberToAdd, "please")
+//                      print(usernameToAdd, "please")
+//                      print(phoneNumberToAdd, "please")
                         
-                        self.friendToDisplay.append(friend)
+                        // START Test alphabetical sort
+                        // let f1 = FriendToDisplay(phonenumber: "+13056784456", username: "123Barty")
+                        // let f2 = FriendToDisplay(phonenumber: "+13056783456", username: "Aania")
+                        
+                        // self.sortAlphabetical(friend: f1)
+                        // self.sortAlphabetical(friend: f2)
+                        // END Test alphabetical sort
+                        
+                        self.sortAlphabetical(friend: friend)
+                        
+                        
                         self.tableView.reloadData()
                         self.contactsToNotAdd.append(phoneNumberToAdd)
                     }
@@ -118,6 +134,25 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
     
     @objc func toggleSettings(){
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .default , handler:{ (UIAlertAction)in
+                  print("User click edit group button")
+                       
+                   guard let groupId = self.group?.groupid else {return}
+                   guard let lastPic = self.group?.lastPicture else {return}
+                   guard let timeStamp = self.group?.creationDate else {return}
+                          
+                   let editGroupVC = EditGroupController()
+                   editGroupVC.groupId = groupId
+                   editGroupVC.lastPic = lastPic
+                   editGroupVC.timeStamp = timeStamp
+                   self.navigationController?.pushNavBar(vc: editGroupVC)
+                                         
+                   self.navigationItem.leftItemsSupplementBackButton = true
+                   self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+                                  
+               }))
+        
                         
         alert.addAction(UIAlertAction(title: "Leave Group", style: .destructive , handler:{ (UIAlertAction)in
             print("User click Delete button")

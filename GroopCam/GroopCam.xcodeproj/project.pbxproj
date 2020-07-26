@@ -11,6 +11,7 @@
 		367600F0249E596C0087DF58 /* FirebaseFilesUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */; };
 		36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37624A3BAFB00E80786 /* CustomLayout.swift */; };
 		36F8E37924A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */; };
+		5DCF295E24CE3D8100758CCA /* EditGroupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCF295D24CE3D8100758CCA /* EditGroupController.swift */; };
 		5E02EF184985C9C6404D8659 /* Pods_GroopCam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */; };
 		8A8D61D42409EF0900203016 /* StripeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D32409EF0900203016 /* StripeClient.swift */; };
 		8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8D61D6240B247000203016 /* CheckoutViewController.swift */; };
@@ -72,6 +73,7 @@
 		367600EF249E596B0087DF58 /* FirebaseFilesUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseFilesUpload.swift; sourceTree = "<group>"; };
 		36F8E37624A3BAFB00E80786 /* CustomLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLayout.swift; sourceTree = "<group>"; };
 		36F8E37824A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlignedCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
+		5DCF295D24CE3D8100758CCA /* EditGroupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGroupController.swift; sourceTree = "<group>"; };
 		8A8D61D32409EF0900203016 /* StripeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeClient.swift; sourceTree = "<group>"; };
 		8A8D61D6240B247000203016 /* CheckoutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutViewController.swift; sourceTree = "<group>"; };
 		8A8D61D7240B247000203016 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -157,6 +159,14 @@
 			path = "Custom Classes";
 			sourceTree = "<group>";
 		};
+		5DCF295A24CE3D2E00758CCA /* EdGroup */ = {
+			isa = PBXGroup;
+			children = (
+				5DCF295D24CE3D8100758CCA /* EditGroupController.swift */,
+			);
+			path = EdGroup;
+			sourceTree = "<group>";
+		};
 		8A8D61D5240B247000203016 /* StripeCheckout */ = {
 			isa = PBXGroup;
 			children = (
@@ -215,6 +225,7 @@
 				8AD5772823C3A1800072CDD7 /* Models */,
 				8AD5773F23C4D1480072CDD7 /* Sign Up */,
 				8AD5774023C4D1690072CDD7 /* Home */,
+				5DCF295A24CE3D2E00758CCA /* EdGroup */,
 				8AD5774123C4D1900072CDD7 /* AddGroup */,
 				8AD5774223C4D1B60072CDD7 /* GroupRoll */,
 				8AD5775423C7970F0072CDD7 /* Camera */,
@@ -477,6 +488,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DCF295E24CE3D8100758CCA /* EditGroupController.swift in Sources */,
 				8AD5772C23C3A1D80072CDD7 /* Group.swift in Sources */,
 				8AD5773423C3A3120072CDD7 /* CreateGroupController.swift in Sources */,
 				8A8D61EF240B247000203016 /* String.swift in Sources */,
@@ -694,7 +706,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam123;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
@@ -730,7 +742,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam123;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
