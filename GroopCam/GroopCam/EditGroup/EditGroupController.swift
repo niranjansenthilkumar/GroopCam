@@ -107,7 +107,8 @@ class EditGroupController: UIViewController {
             self.editGroupButton.setTitle("Update", for: .normal)
             self.navigationController?.popViewController(animated: true)
             NotificationCenter.default.post(name: EditGroupController.updateGroupName, object: nil, userInfo:["groupName": groupName])
-            NotificationCenter.default.post(name: EditGroupController.updateFeedNotificationName, object: nil)
+           // handled by viewWillAppear in Main Controller
+           // NotificationCenter.default.post(name: EditGroupController.updateFeedNotificationName, object: nil)
             
         }
         else{

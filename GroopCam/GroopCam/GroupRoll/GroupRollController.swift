@@ -95,7 +95,7 @@ class GroupRollController: UICollectionViewController {
     var initialPostsCount = 0
     typealias FileCompletionBlock = () -> Void
     var block: FileCompletionBlock?
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
                 
@@ -116,10 +116,11 @@ class GroupRollController: UICollectionViewController {
         guard let groupId = self.group?.groupid else {return}
         
         //self.showSpinner(onView: self.collectionView)
-        
+
         //fetchPostsWithGroupID(groupID: groupId)
+        self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
         observeNewPosts(forGroup: groupId)
-        
+    
         if groupCount == 1 {
             self.friendButton.setTitle(String(groupCount) + " friend 👥", for: .normal)
         }
@@ -127,20 +128,19 @@ class GroupRollController: UICollectionViewController {
             self.friendButton.setTitle(String(groupCount) + " friends 👥", for: .normal)
         }
         
-        
         activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
         activityIndicator!.center = self.collectionView.center
         self.collectionView.addSubview(activityIndicator!)
     
         view.addSubview(dimView)
         dimView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
-
         
         //Custom layout
         let alignedFlowLayout = AlignedCollectionViewFlowLayout(horizontalAlignment: .justified, verticalAlignment: .bottom)
         collectionView.collectionViewLayout = alignedFlowLayout
         
         setUpUploadProgressView()
+        
     }
     
     func setUpUploadProgressView() {
@@ -230,13 +230,15 @@ class GroupRollController: UICollectionViewController {
         self.posts.removeAll()
         self.objects.removeAll()
         fetchPostsWithGroupID(groupID: groupId)
-        
+    
         if self.posts.count == 0 && self.objects.count == 0 {
             self.removeSpinner()
             self.collectionView.reloadData()
+            self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
             self.collectionView?.refreshControl?.endRefreshing()
             return
         }
+        
     }
     
     @objc func updateGroupNameFunc(notification: NSNotification) {
@@ -258,6 +260,7 @@ class GroupRollController: UICollectionViewController {
     
     
     func observeNewPosts(forGroup groupId: String) {
+        
         Database.database().reference().child("posts").child(groupId).observe(.childAdded) { (snapshot) in
             guard let dictionary = snapshot.value as? [String:Any] else {
                 return
@@ -322,7 +325,12 @@ class GroupRollController: UICollectionViewController {
                 
                 self.collectionView.reloadData()
                 self.removeSpinner()
-
+                if self.posts.count == 0 {
+                    self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
+                }
+                else {
+                    self.collectionView.setEmptyMessage("")
+                }
             }
         }
         
@@ -344,6 +352,7 @@ class GroupRollController: UICollectionViewController {
             }
             
             print("Dictionary count is: \(dictionaries.count)")
+            self.collectionView.setEmptyMessage("")
             dictionaries.forEach { (key, value) in
                 guard let dictionary = value as? [String : Any] else {return}
                 
@@ -413,8 +422,10 @@ class GroupRollController: UICollectionViewController {
                     if self.posts.count == self.initialPostsCount + self.assetCount {
                         print("All posts have been fetched")
                         self.initialPostsCount = self.posts.count
+                        self.collectionView.setEmptyMessage("")
                         self.hideActivityIndicator()
                     }
+                    
                 }
             }
         }
@@ -580,7 +591,8 @@ class GroupRollController: UICollectionViewController {
             })
         }
     }
-        
+     
+    /*
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if (self.posts.count == 0) {
             self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
@@ -589,8 +601,11 @@ class GroupRollController: UICollectionViewController {
         }
         
         return self.posts.count
-    }
+    } */
     
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.posts.count
+    }
         
     @objc func handlePrintPhotos(){
         
@@ -1135,6 +1150,8 @@ extension GroupRollController {
         else {
             print("All Images have been uploaded.")
             arrImages.removeAll()
+            self.collectionView.setEmptyMessage("")
+
             //enableViews()
             //resetUploadProgress()
         }

@@ -62,6 +62,10 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+           handleUpdateFeed()
+       }
+    
     
     @objc func handleUpdateFeed() {
         handleRefresh()
@@ -109,7 +113,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
             return
         }
         
-        
+        self.collectionView.setEmptyMessage("")
 
         for group in user.groups {
 //            print(group, "please")
@@ -279,6 +283,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 
         self.present(alert, animated: true, completion: {
             print("completion block")
+            
         })    }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -286,9 +291,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         groupRollVC.group = self.groups[indexPath.row]
         groupRollVC.username = self.username
         groupRollVC.groupCount = self.groups[indexPath.row].members.count
-        
         self.navigationController?.pushNavBarWithTitle(vc: groupRollVC)
-        
         self.navigationItem.leftItemsSupplementBackButton = true
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         

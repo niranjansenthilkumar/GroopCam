@@ -159,12 +159,12 @@
 			path = "Custom Classes";
 			sourceTree = "<group>";
 		};
-		5DCF295A24CE3D2E00758CCA /* EdGroup */ = {
+		5DCF295A24CE3D2E00758CCA /* EditGroup */ = {
 			isa = PBXGroup;
 			children = (
 				5DCF295D24CE3D8100758CCA /* EditGroupController.swift */,
 			);
-			path = EdGroup;
+			path = EditGroup;
 			sourceTree = "<group>";
 		};
 		8A8D61D5240B247000203016 /* StripeCheckout */ = {
@@ -225,7 +225,7 @@
 				8AD5772823C3A1800072CDD7 /* Models */,
 				8AD5773F23C4D1480072CDD7 /* Sign Up */,
 				8AD5774023C4D1690072CDD7 /* Home */,
-				5DCF295A24CE3D2E00758CCA /* EdGroup */,
+				5DCF295A24CE3D2E00758CCA /* EditGroup */,
 				8AD5774123C4D1900072CDD7 /* AddGroup */,
 				8AD5774223C4D1B60072CDD7 /* GroupRoll */,
 				8AD5775423C7970F0072CDD7 /* Camera */,

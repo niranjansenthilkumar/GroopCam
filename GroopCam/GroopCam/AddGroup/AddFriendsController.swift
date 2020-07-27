@@ -279,7 +279,8 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         }
         
         self.navigationController?.popToRootViewController(animated: true)
-        NotificationCenter.default.post(name: AddFriendsController.updateFeedNotificationName, object: nil)
+   //   Edit by Aliva - handled by viewWillAppear in MainController
+   //     NotificationCenter.default.post(name: AddFriendsController.updateFeedNotificationName, object: nil)
 
     }
 
