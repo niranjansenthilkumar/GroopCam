@@ -100,28 +100,27 @@ class UsernameController: UIViewController, UITextFieldDelegate {
             
             let phonevalues = ["uid": uid, "username": username, "phonenumber": phoneNumber]
             let phoneNumberValues = [phoneNumber: phonevalues]
-        Database.database().reference().child("contacts").updateChildValues(phoneNumberValues) { (err, ref) in
-            if let err = err {
-                print("Failed to save phone number into db:", err)
-                return
-            }
-            
-            print("Successfully saved phone number info to db")
-            
-            activityIndicator.stopAnimating()
-            self.submitButton.setTitle("Submit", for: .normal)
-            
-            let navVC = UINavigationController(rootViewController: mainController)
+            Database.database().reference().child("contacts").updateChildValues(phoneNumberValues) { (err, ref) in
+                if let err = err {
+                    print("Failed to save phone number into db:", err)
+                    return
+                }
+                
+                print("Successfully saved phone number info to db")
+                
+                activityIndicator.stopAnimating()
+                self.submitButton.setTitle("Submit", for: .normal)
+                
+                let navVC = UINavigationController(rootViewController: mainController)
 
-            navVC.modalPresentationStyle = .fullScreen
+                navVC.modalPresentationStyle = .fullScreen
 
-            navVC.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
-            navVC.navigationBar.shadowImage = UIImage()
-            
-            NotificationCenter.default.post(name: UsernameController.updateUserFeedNotificationName, object: nil)
-            
-            self.dismiss(animated: true, completion: nil)
-            
+                navVC.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+                navVC.navigationBar.shadowImage = UIImage()
+                
+                NotificationCenter.default.post(name: UsernameController.updateUserFeedNotificationName, object: nil)
+                
+                self.dismiss(animated: true, completion: nil)
             }
         }
         else {

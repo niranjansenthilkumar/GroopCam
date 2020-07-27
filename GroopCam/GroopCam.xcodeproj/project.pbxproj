@@ -65,6 +65,10 @@
 		8AD5775A23C797970072CDD7 /* CustomAnimationPresentor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD5775923C797970072CDD7 /* CustomAnimationPresentor.swift */; };
 		8AD5775C23C797D80072CDD7 /* PreviewPhotoContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD5775B23C797D80072CDD7 /* PreviewPhotoContainer.swift */; };
 		8AD5776123CBAED60072CDD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AD5776023CBAED50072CDD7 /* GoogleService-Info.plist */; };
+		BF35385324C7865300CC6F2E /* DiscountsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF35385224C7865300CC6F2E /* DiscountsController.swift */; };
+		BF35385524C7867A00CC6F2E /* DiscountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF35385424C7867A00CC6F2E /* DiscountCell.swift */; };
+		BF6F71CB24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6F71CA24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift */; };
+		BFD97CFB24C0862B00EBC79A /* ReferralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD97CFA24C0862B00EBC79A /* ReferralViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -130,6 +134,10 @@
 		8AD5775F23CB9D1B0072CDD7 /* GroopCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GroopCam.entitlements; sourceTree = "<group>"; };
 		8AD5776023CBAED50072CDD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		944D472F9EF9E5A41A141F24 /* Pods-GroopCam.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroopCam.release.xcconfig"; path = "Target Support Files/Pods-GroopCam/Pods-GroopCam.release.xcconfig"; sourceTree = "<group>"; };
+		BF35385224C7865300CC6F2E /* DiscountsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscountsController.swift; sourceTree = "<group>"; };
+		BF35385424C7867A00CC6F2E /* DiscountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscountCell.swift; sourceTree = "<group>"; };
+		BF6F71CA24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCheckoutCell.swift; sourceTree = "<group>"; };
+		BFD97CFA24C0862B00EBC79A /* ReferralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferralViewController.swift; sourceTree = "<group>"; };
 		D7DC9676F3A1D2A406E8BA34 /* Pods-GroopCam.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroopCam.debug.xcconfig"; path = "Target Support Files/Pods-GroopCam/Pods-GroopCam.debug.xcconfig"; sourceTree = "<group>"; };
 		FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GroopCam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -167,6 +175,7 @@
 				8A8D61E4240B247000203016 /* CheckoutRowView.swift */,
 				8A8D61E5240B247000203016 /* PaymentContextFooterView.swift */,
 				8A8D61E6240B247000203016 /* SettingsViewController.swift */,
+				BF6F71CA24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift */,
 			);
 			path = StripeCheckout;
 			sourceTree = "<group>";
@@ -215,6 +224,8 @@
 				8AD5772823C3A1800072CDD7 /* Models */,
 				8AD5773F23C4D1480072CDD7 /* Sign Up */,
 				8AD5774023C4D1690072CDD7 /* Home */,
+				BFD97CF824C085C800EBC79A /* Referral */,
+				BF35385124C7861500CC6F2E /* Discounts */,
 				8AD5774123C4D1900072CDD7 /* AddGroup */,
 				8AD5774223C4D1B60072CDD7 /* GroupRoll */,
 				8AD5775423C7970F0072CDD7 /* Camera */,
@@ -349,6 +360,23 @@
 				FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BF35385124C7861500CC6F2E /* Discounts */ = {
+			isa = PBXGroup;
+			children = (
+				BF35385224C7865300CC6F2E /* DiscountsController.swift */,
+				BF35385424C7867A00CC6F2E /* DiscountCell.swift */,
+			);
+			path = Discounts;
+			sourceTree = "<group>";
+		};
+		BFD97CF824C085C800EBC79A /* Referral */ = {
+			isa = PBXGroup;
+			children = (
+				BFD97CFA24C0862B00EBC79A /* ReferralViewController.swift */,
+			);
+			path = Referral;
 			sourceTree = "<group>";
 		};
 		E3B9C08FC56CD5A7DC1B17FB /* Pods */ = {
@@ -497,6 +525,7 @@
 				8AD5772623C342070072CDD7 /* GroupCell.swift in Sources */,
 				8AD5773A23C4CD610072CDD7 /* GroupRollController.swift in Sources */,
 				8AD5771A23C1E8770072CDD7 /* Theme.swift in Sources */,
+				BFD97CFB24C0862B00EBC79A /* ReferralViewController.swift in Sources */,
 				8AD5771C23C1E8AA0072CDD7 /* PhoneVerificationController.swift in Sources */,
 				36F8E37924A50A1A00E80786 /* AlignedCollectionViewFlowLayout.swift in Sources */,
 				8A8D61E7240B247000203016 /* CheckoutViewController.swift in Sources */,
@@ -520,9 +549,12 @@
 				8AD5771E23C252790072CDD7 /* VerificationCodeController.swift in Sources */,
 				8A8D61F1240B247000203016 /* UIImage.swift in Sources */,
 				8AD5775A23C797970072CDD7 /* CustomAnimationPresentor.swift in Sources */,
+				BF35385324C7865300CC6F2E /* DiscountsController.swift in Sources */,
 				8AD5773C23C4CDDF0072CDD7 /* GroupRollCell.swift in Sources */,
 				8A8D61EB240B247000203016 /* Date.swift in Sources */,
+				BF35385524C7867A00CC6F2E /* DiscountCell.swift in Sources */,
 				8A8D61EC240B247000203016 /* UIView.swift in Sources */,
+				BF6F71CB24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift in Sources */,
 				8AD5774423C5F0900072CDD7 /* PictureController.swift in Sources */,
 				8AD5775C23C797D80072CDD7 /* PreviewPhotoContainer.swift in Sources */,
 				8AD5775823C797730072CDD7 /* CustomAnimationDismisser.swift in Sources */,
@@ -677,7 +709,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q45FN4P4G5;
+				DEVELOPMENT_TEAM = UN8GMZ64UC;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -694,7 +726,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam123;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";
@@ -713,7 +745,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q45FN4P4G5;
+				DEVELOPMENT_TEAM = UN8GMZ64UC;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -730,7 +762,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.07;
-				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam123;
+				PRODUCT_BUNDLE_IDENTIFIER = NJ.GroopCam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "GroopCam/ApplePaySwag-Bridging-Header.h";

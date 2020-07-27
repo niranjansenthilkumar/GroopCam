@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -18,8 +20,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        UIApplication.shared.statusBarStyle = .lightContent
         
+//        UIApplication.shared.statusBarStyle = .lightContent
 //        FirebaseApp.configure()
 
 //
@@ -41,10 +43,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        window = UIWindow()
 //        window?.rootViewController = navVC
 
-        if #available(iOS 13.0, *) {
-            guard let _ = (scene as? UIWindowScene) else { return }
-        } else {
-            // Fallback on earlier versions
+        guard let _ = (scene as? UIWindowScene) else { return }
+    }
+    
+    @available(iOS 13.0, *)
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        for urlContext in URLContexts {
+            let url = urlContext.url
+            Auth.auth().canHandle(url)
         }
     }
 

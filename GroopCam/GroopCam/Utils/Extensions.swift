@@ -207,7 +207,7 @@ extension UITextField{
     func setupTextField(backgroundColor: UIColor, ofSize: CGFloat, weight: UIFont.Weight, cornerRadius: CGFloat, keyboardType: UIKeyboardType, textAlignment: NSTextAlignment, keyboardAppearance: UIKeyboardAppearance, textColor: UIColor) -> UITextField {
         
         self.backgroundColor = backgroundColor
-        self.font = .systemFont(ofSize: 30, weight: weight)
+        self.font = .systemFont(ofSize: ofSize, weight: weight)
         self.layer.cornerRadius = cornerRadius
         self.keyboardType = keyboardType
         self.textAlignment = textAlignment

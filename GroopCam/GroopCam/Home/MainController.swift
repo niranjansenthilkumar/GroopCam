@@ -39,6 +39,24 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
             }
             
             return
+        } else {
+            let userid = Auth.auth().currentUser?.uid ?? ""
+            Database.database().reference().child("users").child("\(userid)").observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.hasChild("referred_by") {
+                    DispatchQueue.main.async {
+                        let viewController = ViewController()
+                        let navController = UINavigationController(rootViewController: viewController)
+                        navController.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+                        navController.navigationBar.shadowImage = UIImage()
+                        navController.navigationBar.isTranslucent = true
+                        navController.view.backgroundColor = UIColor.clear
+                        navController.modalPresentationStyle = .fullScreen
+                        self.present(navController, animated: true, completion: nil)
+                    }
+                    return
+                }
+            })
+            
         }
         
 //        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: AddFriendsController.updateFeedNotificationName, object: nil)
@@ -66,8 +84,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
             NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: AddFriendsController.updateFeedNotificationName, object: nil)
             bool = true
         }
-        
-        
     }
     
     
@@ -415,6 +431,14 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //        self.navigationItem.setBackImageEmpty()
     }
     
+    @objc func handleFreePrints(){
+        let referralVC = ReferralViewController()
+        self.navigationController?.pushNavBar(vc: referralVC)
+        
+        self.navigationItem.leftItemsSupplementBackButton = true
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    
     @objc func handleCamera(sender: UIButton){
         
         let data = self.groups[sender.tag]
@@ -449,7 +473,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //        navigationController?.navigationBar.isTranslucent = true
 //        navigationController?.navigationBar.barTintColor = Theme.lgColor
         self.navigationController?.navigationBar.topItem?.title = "Group Rolls"
-//
+
         self.navigationController?.navigationBar.isTranslucent = false
         self.navigationController?.navigationBar.barTintColor = Theme.backgroundColor
 
@@ -458,10 +482,14 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
-//        self.navigationController?.navigationBar.topItem?.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
+        let settingsButton = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
+        let freePrintsButton = UIBarButtonItem(image: UIImage(named: "freeprintsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleFreePrints))
         
-        self.navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "newgroupicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleNewGroup))
+        self.navigationItem.leftBarButtonItems = [settingsButton, freePrintsButton]
+
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "newgroupicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleNewGroup))
+        
+//        self.navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "newgroupicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleNewGroup))
     
     }
 }
@@ -475,7 +503,7 @@ extension Database {
 //            let user = User(uid: uid, dictionary: userDictionary)
             
             let groups = userDictionary["groups"] as? [String : Any] ?? [:]
-            
+                        
             let user = User(uid: uid, username: userDictionary["username"] as! String, phonenumber: userDictionary["phonenumber"] as! String, groups: groups)
             completion(user)
             

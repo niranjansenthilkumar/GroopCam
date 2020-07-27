@@ -337,11 +337,11 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
         self.searchController.searchBar.tintColor = UIColor.white
                 
         searchController.searchBar.barTintColor = Theme.backgroundColor
-        searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
-        
-        searchController.searchBar.searchTextField.placeholder = "Search by username"
-        searchController.searchBar.searchTextField.textColor = Theme.lgColor
-
+        if #available(iOS 13.0, *) {
+            searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
+            searchController.searchBar.searchTextField.placeholder = "Search by username"
+            searchController.searchBar.searchTextField.textColor = Theme.lgColor
+        }
         if let textFieldInsideSearchBar = searchController.searchBar.value(forKey: "searchField") as? UITextField,
             let glassIconView = textFieldInsideSearchBar.leftView as? UIImageView {
                 //Magnifying glass

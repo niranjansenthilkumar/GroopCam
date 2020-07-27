@@ -1,8 +1,10 @@
 import UIKit
 import Stripe
+import Firebase
 import PassKit
+import MessageUI
 
-class PrintQuantityController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ItemCellDelegate {
+class PrintQuantityController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ItemCellDelegate, MFMailComposeViewControllerDelegate {
         
     var objects = [QuantityObject]()
                 
@@ -42,9 +44,25 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         return button
     }()
     
+    let discountField: UITextField = {
+        let field = UITextField().setupTextField(backgroundColor: .white, ofSize: 17, weight: UIFont.Weight.medium, cornerRadius: 10, keyboardType: .default, textAlignment: .left, keyboardAppearance: .light, textColor: .black)
+        field.placeholder = "Enter a discount code"
+        return field
+    }()
+    
+    let applyButton: UIButton = {
+        let button = UIButton().setupButton(backgroundColor: Theme.buttonColor, title: "Apply", titleColor: .white, ofSize: 17, weight: UIFont.Weight.medium, cornerRadius: 15)
+        button.addTarget(self, action: #selector(handleApply), for: .touchUpInside)
+        return button
+    }()
+    
+    var hasDiscountCode = false
+    var discounts = [String]()
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        
         
         collectionView.register(ItemCell.self, forCellWithReuseIdentifier: cellId)
 
@@ -57,8 +75,26 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
         self.totalLabel.text = "Total: $" + String(self.total) + ".00"
         
-        checkoutButton.isHidden = !PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: SupportedPaymentNetworks)
+//        checkoutButton.isHidden = !PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: SupportedPaymentNetworks)
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            self.view.frame.origin.y -= keyboardSize.height
+        }
+    }
+    
+    @objc func keyboardWillHide(_ notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            self.view.frame.origin.y += keyboardSize.height
+        }
     }
     
     func didIncrease(for cell: ItemCell) {
@@ -109,6 +145,51 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
 
     }
     
+    @objc func handleApply() {
+        guard let discountCode = self.discountField.text else { return }
+        if let user = Auth.auth().currentUser {
+            self.showSpinner(onView: self.checkoutView)
+            Database.database().reference().child("discounts").child(user.uid).observeSingleEvent(of: .value, with: {(snapshot) in
+                self.removeSpinner()
+                self.discountField.text = ""
+                guard let discountsDictionary = snapshot.value as? [String: Any] else {
+                    self.presentAlert("Invalid Code!")
+                    return
+                }
+                self.discounts = Array(discountsDictionary.keys)
+                for discount in self.discounts {
+                    if discountCode == discount {
+                        self.hasDiscountCode = true
+                        self.removeDiscountCode(user.uid, discount)
+                        self.presentAlert("Successfully applied discount code!")
+                        return
+                    }
+                }
+                self.presentAlert("Invalid Code!")
+            })
+        }
+    }
+    
+    func removeDiscountCode(_ userId: String, _ discountCode: String) {
+        Database.database().reference().child("discounts").child(userId).child(discountCode).removeValue()
+    }
+    
+    func sendEmail(_ desc: String) {
+        let composeVC = MFMailComposeViewController()
+        composeVC.mailComposeDelegate = self
+        // Configure the fields of the interface.
+        composeVC.setToRecipients([])
+        composeVC.setSubject("GroopCam -")
+        composeVC.setMessageBody(desc, isHTML: false)
+        // Present the view controller modally.
+        self.present(composeVC, animated: true, completion: nil)
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        self.hasDiscountCode = false
+        controller.dismiss(animated: true)
+    }
+    
     let SupportedPaymentNetworks = [PKPaymentNetwork.visa, PKPaymentNetwork.masterCard, PKPaymentNetwork.amex]
     let ApplePaySwagMerchantID = "merchant.groopcam"
     var shiptot: NSDecimalNumber = 0.0
@@ -118,43 +199,121 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         checkoutButton.animateButtonDown()
         if total < 5 {
             self.presentFailedCheckout()
+        } else if hasDiscountCode {
+            if total > 5 {
+                self.presentAlert("You have only 5 free prints!")
+                return
+            }
+            if !MFMailComposeViewController.canSendMail() {
+                self.presentAlert("Email service is not supported on this device!")
+                return
+            }
+            var desc = ""
+            for object in self.objects{
+                let st = "(" + String(object.quantity) + " , " + object.printableObject.post.imageUrl + "), "
+                desc.append(st)
+            }
+            self.sendEmail(desc)
         }
         else{
-            let tot = String(self.total) + ".00"
-
-            shiptot = NSDecimalNumber(value: Double(self.total) + 2.50)
-
-            let shippitot = Double(self.total) + 2.50
-            
-
-            let request = PKPaymentRequest()
-            request.merchantIdentifier = ApplePaySwagMerchantID
-            request.supportedNetworks = SupportedPaymentNetworks
-            request.merchantCapabilities = PKMerchantCapability.capability3DS
-            request.countryCode = "US"
-            request.currencyCode = "USD"
-            request.paymentSummaryItems = [
-                PKPaymentSummaryItem(label: "GroopCam Photos", amount: NSDecimalNumber(value: self.total)),
-                PKPaymentSummaryItem(label: "Shipping", amount: NSDecimalNumber(value: 2.50)),
-                PKPaymentSummaryItem(label: "GroopCam", amount: NSDecimalNumber(value: shippitot))
-            ]
-
-            var address = PKAddressField()
-            address.insert(.postalAddress)
-            address.insert(.email)
-                        
-            request.requiredShippingAddressFields = address
-            
-            var billingAddress = PKAddressField()
-            address.insert(.postalAddress)
-            address.insert(.email)
-            
-            request.requiredBillingAddressFields = address
-            
-            let applePayController = PKPaymentAuthorizationViewController(paymentRequest: request)
-            applePayController?.delegate = self
-            self.present(applePayController!, animated: true, completion: nil)
+            self.toggleCheckout()
         }
+    }
+    
+    func toggleCheckout() {
+//        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//
+//        alert.addAction(UIAlertAction(title: "Manual Checkout", style: .default , handler:{ (UIAlertAction)in
+//            print("User clicked manual checkout")
+//            let settingsVC = SettingsViewController()
+//            let checkoutVC = CheckoutViewController(products: self.objects, settings: settingsVC.settings)
+//            checkoutVC.total = self.total
+//            self.navigationController?.pushNavBarWithTitle(vc: checkoutVC)
+//
+//            self.navigationItem.leftItemsSupplementBackButton = true
+//            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+//        }))
+//
+//        alert.addAction(UIAlertAction(title: "Apple Pay", style: .default , handler:{ (UIAlertAction)in
+//            print("User clicked Apple Pay")
+//            self.proceedApplePay()
+//        }))
+//
+//        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
+//            print("User click Dismiss button")
+//        }))
+//
+//
+//        self.present(alert, animated: true, completion: {
+//            print("completion block")
+//        })
+        
+        if PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: SupportedPaymentNetworks) {
+            self.proceedApplePay()
+        } else {
+            let settingsVC = SettingsViewController()
+            let checkoutVC = CheckoutViewController(products: self.objects, settings: settingsVC.settings)
+            checkoutVC.total = self.total
+            self.navigationController?.pushNavBarWithTitle(vc: checkoutVC)
+            self.navigationItem.leftItemsSupplementBackButton = true
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        }
+        
+    }
+    
+    func proceedApplePay() {
+        shiptot = NSDecimalNumber(value: Double(self.total) + 2.50)
+        
+        let shippitot = Double(self.total) + 2.50
+        
+
+        let request = PKPaymentRequest()
+        request.merchantIdentifier = ApplePaySwagMerchantID
+        request.supportedNetworks = SupportedPaymentNetworks
+        request.merchantCapabilities = PKMerchantCapability.capability3DS
+        request.countryCode = "US"
+        request.currencyCode = "USD"
+        request.paymentSummaryItems = [
+            PKPaymentSummaryItem(label: "GroopCam Photos", amount: NSDecimalNumber(value: self.total)),
+            PKPaymentSummaryItem(label: "Shipping", amount: NSDecimalNumber(value: 2.50)),
+            PKPaymentSummaryItem(label: "GroopCam", amount: NSDecimalNumber(value: shippitot))
+        ]
+
+//            var address = PKAddressField()
+//            address.insert(.postalAddress)
+//            address.insert(.email)
+                                
+        request.requiredShippingContactFields = [PKContactField.postalAddress, PKContactField.emailAddress]
+                    
+        //            var billingAddress = PKAddressField()
+        //            address.insert(.postalAddress)
+        //            address.insert(.email)
+                    
+        request.requiredBillingContactFields = [PKContactField.postalAddress, PKContactField.emailAddress]
+                    
+        let applePayController = PKPaymentAuthorizationViewController(paymentRequest: request)
+        applePayController?.delegate = self
+        self.present(applePayController!, animated: true, completion: nil)
+    }
+    
+    func presentAlert(_ title: String){
+        let alert = UIAlertController(title: title, message: "", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+              switch action.style{
+              case .default:
+                    print("default")
+
+              case .cancel:
+                    print("cancel")
+
+              case .destructive:
+                    print("destructive")
+
+              @unknown default:
+               fatalError()
+           }}))
+        self.present(alert, animated: true, completion: nil)
+
     }
 
     
@@ -171,8 +330,9 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
                case .destructive:
                      print("destructive")
 
-
-         }}))
+               @unknown default:
+                fatalError()
+            }}))
          self.present(alert, animated: true, completion: nil)
 
      }
@@ -231,7 +391,10 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         self.objects.removeAll()
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -249,7 +412,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
         collectionView.backgroundColor = Theme.backgroundColor
         
-        collectionView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 200, paddingRight: 0, width: 0, height: 0)
+        collectionView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 270, paddingRight: 0, width: 0, height: 0)
                 
         collectionView.alwaysBounceVertical = true
         
@@ -258,12 +421,21 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         view.addSubview(checkoutView)
         checkoutView.anchor(top: collectionView.bottomAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
         
+        checkoutView.addSubview(applyButton)
+        applyButton.anchor(top: collectionView.bottomAnchor, left: nil, bottom: nil, right: view.rightAnchor, paddingTop: 15, paddingLeft: 0, paddingBottom: 0, paddingRight: 12, width: 80, height: 40)
+        applyButton.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
+        
+        checkoutView.addSubview(discountField)
+        discountField.anchor(top: collectionView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: applyButton.leftAnchor, paddingTop: 15, paddingLeft: 12, paddingBottom: 0, paddingRight: 12, width: 80, height: 40)
+        discountField.delegate = self
+//        discountField.becomeFirstResponder()
+        
         checkoutView.addSubview(checkoutButton)
-        checkoutButton.anchor(top: collectionView.bottomAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 90, paddingLeft: 12, paddingBottom: 43, paddingRight: 12, width: 0, height: 0)
+        checkoutButton.anchor(top: collectionView.bottomAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 160, paddingLeft: 12, paddingBottom: 43, paddingRight: 12, width: 0, height: 0)
         checkoutButton.layer.applySketchShadow(color: .black, alpha: 0.5, x: 0, y: 2, blur: 4, spread: 0)
         
         checkoutView.addSubview(filmLabel)
-        filmLabel.anchor(top: collectionView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 3, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 18)
+        filmLabel.anchor(top: collectionView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 73, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 18)
         
         checkoutView.addSubview(minLabel)
         minLabel.anchor(top: filmLabel.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 4, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 18)
@@ -273,24 +445,45 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
     }
     
-    func createShippingAddressFromRef(address: ABRecord!) -> Address {
-      var shippingAddress: Address = Address()
-            
-      shippingAddress.FirstName = ABRecordCopyValue(address, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
-      shippingAddress.LastName = ABRecordCopyValue(address, kABPersonLastNameProperty)?.takeRetainedValue() as? String
-        
-        let addressProperty : ABMultiValue = ABRecordCopyValue(address, kABPersonAddressProperty).takeUnretainedValue() as ABMultiValue
-      if let dict : NSDictionary = ABMultiValueCopyValueAtIndex(addressProperty, 0).takeUnretainedValue() as? NSDictionary {
-        shippingAddress.Street = dict[String(kABPersonAddressStreetKey)] as? String
-        shippingAddress.City = dict[String(kABPersonAddressCityKey)] as? String
-        shippingAddress.State = dict[String(kABPersonAddressStateKey)] as? String
-        shippingAddress.Zip = dict[String(kABPersonAddressZIPKey)] as? String
-        
-      }
-            
-      return shippingAddress
+    func createShippingAddressFromRef(address: PKContact) -> Address {
+        var shippingAddress: Address = Address()
+              
+        shippingAddress.FirstName = address.name?.givenName
+        shippingAddress.LastName = address.name?.familyName
+        shippingAddress.Street = address.postalAddress?.street
+        shippingAddress.City = address.postalAddress?.city
+        shippingAddress.State = address.postalAddress?.state
+        shippingAddress.Zip = address.postalAddress?.postalCode
+              
+        return shippingAddress
     }
+    
+//    func createShippingAddressFromRef(address: ABRecord!) -> Address {
+//      var shippingAddress: Address = Address()
+//
+//      shippingAddress.FirstName = ABRecordCopyValue(address, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
+//      shippingAddress.LastName = ABRecordCopyValue(address, kABPersonLastNameProperty)?.takeRetainedValue() as? String
+//
+//        let addressProperty : ABMultiValue = ABRecordCopyValue(address, kABPersonAddressProperty).takeUnretainedValue() as ABMultiValue
+//      if let dict : NSDictionary = ABMultiValueCopyValueAtIndex(addressProperty, 0).takeUnretainedValue() as? NSDictionary {
+//        shippingAddress.Street = dict[String(kABPersonAddressStreetKey)] as? String
+//        shippingAddress.City = dict[String(kABPersonAddressCityKey)] as? String
+//        shippingAddress.State = dict[String(kABPersonAddressStateKey)] as? String
+//        shippingAddress.Zip = dict[String(kABPersonAddressZIPKey)] as? String
+//
+//      }
+//
+//      return shippingAddress
+//    }
 
+}
+
+extension PrintQuantityController: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        return textField.resignFirstResponder()
+    }
+    
 }
 
 extension PrintQuantityController: PKPaymentAuthorizationViewControllerDelegate {
@@ -299,121 +492,142 @@ extension PrintQuantityController: PKPaymentAuthorizationViewControllerDelegate 
 
         // 1
         print(123)
-        let shippingAddress = self.createShippingAddressFromRef(address: payment.shippingAddress)
-        
-        
+//        let shippingAddress = self.createShippingAddressFromRef(address: payment.shippingAddress)
         
         // 2
+//        Stripe.setDefaultPublishableKey("pk_test_51H7kEVGsV27pOa0Ot4JccQx1EEN39C4yg1wgtVxbh3ixZUSvmx8glp0kccsQSID5I1XCvE14ZLe4XYNHtviXd3vf00pVICEpCv")
 //        Stripe.setDefaultPublishableKey("pk_test_pUrttWCwYjM0Ge3VzWJhT9v800pwbF49Ik")  // Replace With Your Own Key!
         
-         Stripe.setDefaultPublishableKey("pk_live_b1pjET7QOxe5hVHCABXX5oZx00k8hUVqEo")  // Replace With Your Own Key!
-        
-//        pk_live_b1pjET7QOxe5hVHCABXX5oZx00k8hUVqEo
-    
+        Stripe.setDefaultPublishableKey("pk_live_b1pjET7QOxe5hVHCABXX5oZx00k8hUVqEo")  // Replace With Your Own Key!
+            
         print(256)
     
         // 3
         STPAPIClient.shared().createToken(with: payment) {
           (token, error) -> Void in
     
-          if (error != nil) {
-            print(error)
+        if (error != nil) {
+            print(error ?? "Error")
 //            completion(PKPaymentAuthorizationStatus.failure)
             completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
             return
-          }
+        }
     
           // 4
-            let shippingAddress = self.createShippingAddressFromRef(address: payment.shippingAddress)
+        let shippingAddress = self.createShippingAddressFromRef(address: payment.shippingContact!)
             
-            let billingAddress = self.createShippingAddressFromRef(address: payment.billingAddress)
+        let billingAddress = self.createShippingAddressFromRef(address: payment.billingContact!)
                 
-            print(billingAddress, 256)
+        print(billingAddress, 256)
         
-            let emailAddress = payment.shippingContact?.emailAddress!
+        let emailAddress = payment.shippingContact?.emailAddress!
             
           // 5
-          let url = NSURL(string: "https://groopcamstripe2.herokuapp.com/pay")
-//          let url = NSURL(string: "http://127.0.0.1:5000/pay")  // Replace with computers local IP Address!
-          let request = NSMutableURLRequest(url: url! as URL)
+//        let url = NSURL(string: "https://groopcamios.herokuapp.com/pay")
+        let url = NSURL(string: "https://groopcamstripe2.herokuapp.com/pay")
+//        let url = NSURL(string: "http://127.0.0.1:5000/pay")  // Replace with computers local IP Address!
+        let request = NSMutableURLRequest(url: url! as URL)
           request.httpMethod = "POST"
           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
           request.setValue("application/json", forHTTPHeaderField: "Accept")
             
           // 6
-            let tot = self.total * 100
-            let shipping_tot = 250
-            let final_tot = tot + shipping_tot
-    
-            var desc = ""
-            for object in self.objects{
-                let st = "(" + String(object.quantity) + " , " + object.printableObject.post.imageUrl + "), "
-                desc.append(st)
-            }
+        let tot = self.total * 100
+        let shipping_tot = 250
+        let final_tot = tot + shipping_tot
+
+        var desc = ""
+        for object in self.objects{
+            let st = "(" + String(object.quantity) + " , " + object.printableObject.post.imageUrl + "), "
+            desc.append(st)
+        }
             
         
                         
-            let final_name = shippingAddress.FirstName! + " " + shippingAddress.LastName!
+        let final_name = shippingAddress.FirstName! + " " + shippingAddress.LastName!
             
-            let shipping = [
-                "name": final_name,
-                "address": [
-                    "line1": shippingAddress.Street!,
-                    "city": shippingAddress.City!,
-                    "country": "US",
-                    "postal_code": shippingAddress.Zip],
+        let shipping = [
+            "name": final_name,
+            "address": [
+                "line1": shippingAddress.Street!,
+                "city": shippingAddress.City!,
+                "country": "US",
+                "postal_code": shippingAddress.Zip]
+        ] as [String : Any]
+            
+        let body = [
+            "stripeToken": token!.tokenId,
+            "amount": final_tot,
+            "description": emailAddress! + " " + desc,
+            "email": emailAddress!,
+            "shippingActual": shipping
             ] as [String : Any]
-            
-            let body = [
-                        "stripeToken": token!.tokenId,
-                        "amount": final_tot,
-                        "description": emailAddress! + " " + desc,
-                        "email": emailAddress!,
-                        "shippingActual": shipping
-                ] as [String : Any]
     
-            print(body, 123)
+        print(body, 123)
             
-          var error: NSError?
+//          var error: NSError?
     //        request.HTTPBody = JSONSerialization.dataWithJSONObject(body, options: JSONSerialization.WritingOptions(), error: &error)
     
     //        request.httpBody = JSONSerialization.datawith
     
-            do {
-                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: JSONSerialization.WritingOptions())
-            }
-            catch{
-                print("Caught error:", error)
-            }
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: JSONSerialization.WritingOptions())
+        }
+        catch{
+            print("Caught error:", error)
+        }
     
           // 7
-            NSURLConnection.sendAsynchronousRequest(request as URLRequest, queue: OperationQueue.main) { (response, data, error) -> Void in
+        URLSession.shared.dataTask(with: request as URLRequest, completionHandler: {data, respnse, error -> Void in
             if (error != nil) {
-//                completion(PKPaymentAuthorizationStatus.failure)
                 completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
             } else {
-//                completion(PKPaymentAuthorizationStatus.success)
                 completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: []))
                 self.navigationController?.popToRootViewController(animated: true)
             }
-          }
+        })
+            
+//            NSURLConnection.sendAsynchronousRequest(request as URLRequest, queue: OperationQueue.main) { (response, data, error) -> Void in
+//            if (error != nil) {
+////                completion(PKPaymentAuthorizationStatus.failure)
+//                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
+//            } else {
+////                completion(PKPaymentAuthorizationStatus.success)
+//                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: []))
+//                self.navigationController?.popToRootViewController(animated: true)
+//            }
+//          }
+            
         }
     }
-  
-  func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController!) {
-    controller.dismiss(animated: true, completion: nil)
-  }
     
-    func paymentAuthorizationViewController(controller: PKPaymentAuthorizationViewController!, didSelectShippingAddress address: ABRecord!, completion: ((PKPaymentAuthorizationStatus, [AnyObject]?, [AnyObject]?) -> Void)!) {
-        let shippingAddress = createShippingAddressFromRef(address: address)
-
+    func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+    
+    func paymentAuthorizationViewController(_ controller: PKPaymentAuthorizationViewController, didSelectShippingContact contact: PKContact, completion: (PKPaymentAuthorizationStatus, [PKShippingMethod], [PKPaymentSummaryItem]) -> Void) {
+        let shippingAddress = createShippingAddressFromRef(address: contact)
+        
         switch (shippingAddress.State, shippingAddress.City, shippingAddress.Zip) {
-        case (.some(let state), .some(let city), .some(let zip)):
-            completion(PKPaymentAuthorizationStatus.success, nil, nil)
-          default:
-            completion(PKPaymentAuthorizationStatus.invalidShippingPostalAddress, nil, nil)
+        case (.some( _), .some( _), .some( _)):
+            completion(PKPaymentAuthorizationStatus.success, [], [])
+        default:
+            completion(PKPaymentAuthorizationStatus.failure, [], [])
         }
     }
+    
+    
+//    func paymentAuthorizationViewController(controller: PKPaymentAuthorizationViewController!, didSelectShippingAddress address: ABRecord!, completion: ((PKPaymentAuthorizationStatus, [AnyObject]?, [AnyObject]?) -> Void)!) {
+//        let shippingAddress = createShippingAddressFromRef(address: address)
+//
+//        switch (shippingAddress.State, shippingAddress.City, shippingAddress.Zip) {
+//        case (.some(let state), .some(let city), .some(let zip)):
+//            completion(PKPaymentAuthorizationStatus.success, nil, nil)
+//          default:
+//            completion(PKPaymentAuthorizationStatus.invalidShippingPostalAddress, nil, nil)
+//        }
+//    }
+    
 }
 
 struct Address {

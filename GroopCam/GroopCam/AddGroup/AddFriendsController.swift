@@ -135,7 +135,7 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
                         
 //                        print(contact.givenName + " " + contact.familyName)
                         
-                        var ogphoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
+                        let ogphoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
                         
                         var phoneNumber = ogphoneNumber.components(separatedBy:CharacterSet.decimalDigits.inverted).joined()
                                                 
@@ -306,7 +306,7 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
     fileprivate func setupSearchBar(){
 
         searchController.searchResultsUpdater = self
-        searchController.dimsBackgroundDuringPresentation = false
+        searchController.obscuresBackgroundDuringPresentation = false
         definesPresentationContext = true
         self.searchController.searchBar.isTranslucent = false
         self.searchController.searchBar.backgroundImage = UIImage()
@@ -314,10 +314,11 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         self.searchController.searchBar.tintColor = UIColor.white
                 
         searchController.searchBar.barTintColor = Theme.backgroundColor
-        searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
-        
-        searchController.searchBar.searchTextField.placeholder = "Search by username"
-        searchController.searchBar.searchTextField.textColor = Theme.lgColor
+        if #available(iOS 13.0, *) {
+            searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
+            searchController.searchBar.searchTextField.placeholder = "Search by username"
+            searchController.searchBar.searchTextField.textColor = Theme.lgColor
+        }
 
         if let textFieldInsideSearchBar = searchController.searchBar.value(forKey: "searchField") as? UITextField,
             let glassIconView = textFieldInsideSearchBar.leftView as? UIImageView {

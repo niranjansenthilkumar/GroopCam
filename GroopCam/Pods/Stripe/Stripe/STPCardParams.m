@@ -7,6 +7,8 @@
 //
 
 #import "STPCardParams.h"
+#import "STPCard+Private.h"
+
 #import "STPCardValidator.h"
 #import "StripeError.h"
 
@@ -18,6 +20,7 @@
     self = [super init];
     if (self) {
         _additionalAPIParameters = @{};
+        _address = [STPAddress new];
     }
     return self;
 }
@@ -30,121 +33,38 @@
     }
 }
 
-- (BOOL)validateNumber:(id *)ioValue error:(NSError **)outError {
-    if (*ioValue == nil) {
-        return [self.class handleValidationErrorForParameter:@"number" error:outError];
-    }
-    NSString *ioValueString = (NSString *)*ioValue;
-    
-    if ([STPCardValidator validationStateForNumber:ioValueString validatingCardBrand:NO] != STPCardValidationStateValid) {
-        return [self.class handleValidationErrorForParameter:@"number" error:outError];
-    }
-    return YES;
+- (void)setName:(NSString *)name {
+    _name = [name copy];
+    self.address.name = self.name;
 }
 
-- (BOOL)validateCvc:(id *)ioValue error:(NSError **)outError {
-    if (*ioValue == nil) {
-        return [self.class handleValidationErrorForParameter:@"number" error:outError];
-    }
-    NSString *ioValueString = (NSString *)*ioValue;
-    
-    STPCardBrand brand = [STPCardValidator brandForNumber:self.number];
-    
-    if ([STPCardValidator validationStateForCVC:ioValueString cardBrand:brand] != STPCardValidationStateValid) {
-        return [self.class handleValidationErrorForParameter:@"cvc" error:outError];
-    }
-    return YES;
+- (void)setAddress:(STPAddress *)address {
+    _address = address;
+    _name = [address.name copy];
 }
 
-- (BOOL)validateExpMonth:(id *)ioValue error:(NSError **)outError {
-    if (*ioValue == nil) {
-        return [self.class handleValidationErrorForParameter:@"expMonth" error:outError];
-    }
-    NSString *ioValueString = [(NSString *)*ioValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    
-    if ([STPCardValidator validationStateForExpirationMonth:ioValueString] != STPCardValidationStateValid) {
-        return [self.class handleValidationErrorForParameter:@"expMonth" error:outError];
-    }
-    return YES;
-}
+#pragma mark - Description
 
-- (BOOL)validateExpYear:(id *)ioValue error:(NSError **)outError {
-    if (*ioValue == nil) {
-        return [self.class handleValidationErrorForParameter:@"expYear" error:outError];
-    }
-    NSString *ioValueString = [(NSString *)*ioValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    
-    NSString *monthString = [@(self.expMonth) stringValue];
-    if ([STPCardValidator validationStateForExpirationYear:ioValueString inMonth:monthString] != STPCardValidationStateValid) {
-        return [self.class handleValidationErrorForParameter:@"expYear" error:outError];
-    }
-    return YES;
-}
+- (NSString *)description {
+    NSArray *props = @[
+                       // Object
+                       [NSString stringWithFormat:@"%@: %p", NSStringFromClass([self class]), self],
 
-- (BOOL)validateCardReturningError:(NSError **)outError {
-    // Order matters here
-    NSString *numberRef = [self number];
-    NSString *expMonthRef = [NSString stringWithFormat:@"%02lu", (unsigned long)[self expMonth]];
-    NSString *expYearRef = [NSString stringWithFormat:@"%02lu", (unsigned long)[self expYear]];
-    NSString *cvcRef = [self cvc];
-    
-    // Make sure expMonth, expYear, and number are set.  Validate CVC if it is provided
-    return [self validateNumber:&numberRef error:outError] && [self validateExpYear:&expYearRef error:outError] &&
-    [self validateExpMonth:&expMonthRef error:outError] && (cvcRef == nil || [self validateCvc:&cvcRef error:outError]);
-}
+                       // Basic card details
+                       [NSString stringWithFormat:@"last4 = %@", self.last4],
+                       [NSString stringWithFormat:@"expMonth = %lu", (unsigned long)self.expMonth],
+                       [NSString stringWithFormat:@"expYear = %lu", (unsigned long)self.expYear],
+                       [NSString stringWithFormat:@"cvc = %@", (self.cvc) ? @"<redacted>" : nil],
 
-#pragma mark Private Helpers
-+ (BOOL)handleValidationErrorForParameter:(NSString *)parameter error:(NSError **)outError {
-    if (outError != nil) {
-        if ([parameter isEqualToString:@"number"]) {
-            *outError = [self createErrorWithMessage:STPCardErrorInvalidNumberUserMessage
-                                           parameter:parameter
-                                       cardErrorCode:STPInvalidNumber
-                                     devErrorMessage:@"Card number must be between 10 and 19 digits long and Luhn valid."];
-        } else if ([parameter isEqualToString:@"cvc"]) {
-            *outError = [self createErrorWithMessage:STPCardErrorInvalidCVCUserMessage
-                                           parameter:parameter
-                                       cardErrorCode:STPInvalidCVC
-                                     devErrorMessage:@"Card CVC must be numeric, 3 digits for Visa, Discover, MasterCard, JCB, and Discover cards, and 3 or 4 "
-                         @"digits for American Express cards."];
-        } else if ([parameter isEqualToString:@"expMonth"]) {
-            *outError = [self createErrorWithMessage:STPCardErrorInvalidExpMonthUserMessage
-                                           parameter:parameter
-                                       cardErrorCode:STPInvalidExpMonth
-                                     devErrorMessage:@"expMonth must be less than 13"];
-        } else if ([parameter isEqualToString:@"expYear"]) {
-            *outError = [self createErrorWithMessage:STPCardErrorInvalidExpYearUserMessage
-                                           parameter:parameter
-                                       cardErrorCode:STPInvalidExpYear
-                                     devErrorMessage:@"expYear must be this year or a year in the future"];
-        } else {
-            // This should not be possible since this is a private method so we
-            // know exactly how it is called.  We use STPAPIError for all errors
-            // that are unexpected within the bindings as well.
-            *outError = [[NSError alloc] initWithDomain:StripeDomain
-                                                   code:STPAPIError
-                                               userInfo:@{
-                                                          NSLocalizedDescriptionKey: STPUnexpectedError,
-                                                          STPErrorMessageKey: @"There was an error within the Stripe client library when trying to generate the "
-                                                          @"proper validation error. Contact support@stripe.com if you see this."
-                                                          }];
-        }
-    }
-    return NO;
-}
+                       // Additional card details (alphabetical)
+                       [NSString stringWithFormat:@"currency = %@", self.currency],
 
-+ (NSError *)createErrorWithMessage:(NSString *)userMessage
-                          parameter:(NSString *)parameter
-                      cardErrorCode:(NSString *)cardErrorCode
-                    devErrorMessage:(NSString *)devMessage {
-    return [[NSError alloc] initWithDomain:StripeDomain
-                                      code:STPCardError
-                                  userInfo:@{
-                                             NSLocalizedDescriptionKey: userMessage,
-                                             STPErrorParameterKey: parameter,
-                                             STPCardErrorCodeKey: cardErrorCode,
-                                             STPErrorMessageKey: devMessage
-                                             }];
+                       // Cardholder details
+                       [NSString stringWithFormat:@"name = %@", (self.name) ? @"<redacted>" : nil],
+                       [NSString stringWithFormat:@"address = %@", (self.address) ? @"<redacted>" : nil],
+                       ];
+
+    return [NSString stringWithFormat:@"<%@>", [props componentsJoinedByString:@"; "]];
 }
 
 #pragma mark - STPFormEncodable
@@ -155,19 +75,89 @@
 
 + (NSDictionary *)propertyNamesToFormFieldNamesMapping {
     return @{
-             @"number": @"number",
-             @"cvc": @"cvc",
-             @"name": @"name",
-             @"addressLine1": @"address_line1",
-             @"addressLine2": @"address_line2",
-             @"addressCity": @"address_city",
-             @"addressState": @"address_state",
-             @"addressZip": @"address_zip",
-             @"addressCountry": @"address_country",
-             @"expMonth": @"exp_month",
-             @"expYear": @"exp_year",
-             @"currency": @"currency",
+             NSStringFromSelector(@selector(number)): @"number",
+             NSStringFromSelector(@selector(cvc)): @"cvc",
+             NSStringFromSelector(@selector(name)): @"name",
+             NSStringFromSelector(@selector(addressLine1)): @"address_line1",
+             NSStringFromSelector(@selector(addressLine2)): @"address_line2",
+             NSStringFromSelector(@selector(addressCity)): @"address_city",
+             NSStringFromSelector(@selector(addressState)): @"address_state",
+             NSStringFromSelector(@selector(addressZip)): @"address_zip",
+             NSStringFromSelector(@selector(addressCountry)): @"address_country",
+             NSStringFromSelector(@selector(expMonth)): @"exp_month",
+             NSStringFromSelector(@selector(expYear)): @"exp_year",
+             NSStringFromSelector(@selector(currency)): @"currency",
              };
+}
+
+#pragma mark - Deprecated methods
+
+- (void)setAddressLine1:(NSString *)addressLine1 {
+    self.address.line1 = addressLine1;
+}
+
+- (NSString *)addressLine1 {
+    return self.address.line1;
+}
+
+- (void)setAddressLine2:(NSString *)addressLine2 {
+    self.address.line2 = addressLine2;
+}
+
+- (NSString *)addressLine2 {
+    return self.address.line2;
+}
+
+- (void)setAddressZip:(NSString *)addressZip {
+    self.address.postalCode = addressZip;
+}
+
+- (NSString *)addressZip {
+    return self.address.postalCode;
+}
+
+- (void)setAddressCity:(NSString *)addressCity {
+    self.address.city = addressCity;
+}
+
+- (NSString *)addressCity {
+    return self.address.city;
+}
+
+- (void)setAddressState:(NSString *)addressState {
+    self.address.state = addressState;
+}
+
+- (NSString *)addressState {
+    return self.address.state;
+}
+
+- (void)setAddressCountry:(NSString *)addressCountry {
+    self.address.country = addressCountry;
+}
+
+- (NSString *)addressCountry {
+    return self.address.country;
+}
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(__unused NSZone *)zone {
+    STPCardParams *copyCardParams = [self.class new];
+
+    copyCardParams.number = self.number;
+    copyCardParams.expMonth = self.expMonth;
+    copyCardParams.expYear = self.expYear;
+    copyCardParams.cvc = self.cvc;
+
+    // Use ivar to avoid setName:/setAddress: behavior that'd possibly overwrite name/address.name
+    copyCardParams->_name = self.name;
+    copyCardParams->_address = [self.address copy];
+
+    copyCardParams.currency = self.currency;
+    copyCardParams.additionalAPIParameters = self.additionalAPIParameters;
+
+    return copyCardParams;
 }
 
 @end

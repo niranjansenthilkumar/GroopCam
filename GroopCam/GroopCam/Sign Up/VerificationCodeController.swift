@@ -61,54 +61,65 @@ class VerificationCodeController: UIViewController {
         withVerificationID: verificationID,
         verificationCode: verificationCode)
         
-        
-        
-        Auth.auth().signIn(with: credential) { (authResult, error) in
-            if let error = error {
-                self.presentFailedVerification()
-                activityIndicator.stopAnimating()
-                self.verifyCodeButton.setTitle("Verify", for: .normal)
-                return
+        if let user = Auth.auth().currentUser {
+            user.link(with: credential) { (user, error) in
+                let usernameVC = UsernameController()
+                usernameVC.phoneNumber = self.phoneNumber
+                self.navigationController?.pushNavBar(vc: usernameVC)
+                self.navigationItem.setBackImageEmpty()
+                
+                UserDefaults.standard.set(user?.user.uid, forKey: "userid")
+                UserDefaults.standard.synchronize()
             }
+        }
+        
+        if Auth.auth().currentUser == nil {
             
-            guard let uid = authResult?.user.uid else {return}
-            
-            Database.database().reference().child("users").observeSingleEvent(of: .value) { (snapshot) in
-                if snapshot.hasChild(uid){
-                    print("phonenumber exists")
-
+            Auth.auth().signIn(with: credential) { (authResult, error) in
+                if let error = error {
+                    self.presentFailedVerification()
                     activityIndicator.stopAnimating()
                     self.verifyCodeButton.setTitle("Verify", for: .normal)
-
-                    
-                    let mainController = MainController(collectionViewLayout: UICollectionViewFlowLayout())
-                    
-                    let navVC = UINavigationController(rootViewController: mainController)
-
-                    navVC.modalPresentationStyle = .fullScreen
-
-                    navVC.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
-                    navVC.navigationBar.shadowImage = UIImage()
-                    
-                    NotificationCenter.default.post(name: VerificationCodeController.updateLoggedNotificationName, object: nil)
-
-                    self.dismiss(animated: true, completion: nil)
+                    return
                 }
-                else{
-                    print("phonenumber is new")
-                    
-                    let usernameVC = UsernameController()
-                    usernameVC.phoneNumber = self.phoneNumber
-                    self.navigationController?.pushNavBar(vc: usernameVC)
-                    self.navigationItem.setBackImageEmpty()
-                    
-                    UserDefaults.standard.set(uid, forKey: "userid")
-                    UserDefaults.standard.synchronize()
+                
+                guard let uid = authResult?.user.uid else {return}
+                
+                Database.database().reference().child("users").observeSingleEvent(of: .value) { (snapshot) in
+                    if snapshot.hasChild(uid){
+                        print("phonenumber exists")
+
+                        activityIndicator.stopAnimating()
+                        self.verifyCodeButton.setTitle("Verify", for: .normal)
+
+                        
+                        let mainController = MainController(collectionViewLayout: UICollectionViewFlowLayout())
+                        
+                        let navVC = UINavigationController(rootViewController: mainController)
+
+                        navVC.modalPresentationStyle = .fullScreen
+
+                        navVC.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+                        navVC.navigationBar.shadowImage = UIImage()
+                        
+                        NotificationCenter.default.post(name: VerificationCodeController.updateLoggedNotificationName, object: nil)
+
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                    else{
+                        print("phonenumber is new")
+                        
+                        let usernameVC = UsernameController()
+                        usernameVC.phoneNumber = self.phoneNumber
+                        self.navigationController?.pushNavBar(vc: usernameVC)
+                        self.navigationItem.setBackImageEmpty()
+                        
+                        UserDefaults.standard.set(uid, forKey: "userid")
+                        UserDefaults.standard.synchronize()
+                    }
                 }
             }
             
-        
-
         }
         
     }

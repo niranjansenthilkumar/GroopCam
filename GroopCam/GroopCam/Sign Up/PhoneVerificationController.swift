@@ -107,8 +107,9 @@ class PhoneVerificationController: UIViewController, UITextFieldDelegate {
               case .destructive:
                     print("destructive")
 
-
-        }}))
+              @unknown default:
+                fatalError()
+            }}))
         self.present(alert, animated: true, completion: nil)
 
     }
