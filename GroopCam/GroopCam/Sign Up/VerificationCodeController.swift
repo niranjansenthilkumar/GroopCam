@@ -92,6 +92,9 @@ class VerificationCodeController: UIViewController {
                         activityIndicator.stopAnimating()
                         self.verifyCodeButton.setTitle("Verify", for: .normal)
 
+                        if let username = snapshot.childSnapshot(forPath: "\(uid)/username").value as? String {
+                            UserDefaults.standard.set(username, forKey: "username")
+                        }
                         
                         let mainController = MainController(collectionViewLayout: UICollectionViewFlowLayout())
                         

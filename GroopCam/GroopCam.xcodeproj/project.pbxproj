@@ -68,6 +68,7 @@
 		BF35385324C7865300CC6F2E /* DiscountsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF35385224C7865300CC6F2E /* DiscountsController.swift */; };
 		BF35385524C7867A00CC6F2E /* DiscountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF35385424C7867A00CC6F2E /* DiscountCell.swift */; };
 		BF6F71CB24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6F71CA24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift */; };
+		BFA46C3324CF362F009129F9 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA46C3224CF362F009129F9 /* PushNotificationSender.swift */; };
 		BFD97CFB24C0862B00EBC79A /* ReferralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD97CFA24C0862B00EBC79A /* ReferralViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -137,6 +138,7 @@
 		BF35385224C7865300CC6F2E /* DiscountsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscountsController.swift; sourceTree = "<group>"; };
 		BF35385424C7867A00CC6F2E /* DiscountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscountCell.swift; sourceTree = "<group>"; };
 		BF6F71CA24C8AEEF001BA8C7 /* EmojiCheckoutCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCheckoutCell.swift; sourceTree = "<group>"; };
+		BFA46C3224CF362F009129F9 /* PushNotificationSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
 		BFD97CFA24C0862B00EBC79A /* ReferralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferralViewController.swift; sourceTree = "<group>"; };
 		D7DC9676F3A1D2A406E8BA34 /* Pods-GroopCam.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroopCam.debug.xcconfig"; path = "Target Support Files/Pods-GroopCam/Pods-GroopCam.debug.xcconfig"; sourceTree = "<group>"; };
 		FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GroopCam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -234,6 +236,7 @@
 				8AD5774523C5F0970072CDD7 /* Picture */,
 				8A8D61D5240B247000203016 /* StripeCheckout */,
 				367600EC249D155E0087DF58 /* Custom Classes */,
+				BFA46C3124CF35FB009129F9 /* FCM */,
 				8AD5770B23C1E85B0072CDD7 /* Assets.xcassets */,
 				8AD5770D23C1E85B0072CDD7 /* LaunchScreen.storyboard */,
 				8AD5771023C1E85B0072CDD7 /* Info.plist */,
@@ -369,6 +372,14 @@
 				BF35385424C7867A00CC6F2E /* DiscountCell.swift */,
 			);
 			path = Discounts;
+			sourceTree = "<group>";
+		};
+		BFA46C3124CF35FB009129F9 /* FCM */ = {
+			isa = PBXGroup;
+			children = (
+				BFA46C3224CF362F009129F9 /* PushNotificationSender.swift */,
+			);
+			path = FCM;
 			sourceTree = "<group>";
 		};
 		BFD97CF824C085C800EBC79A /* Referral */ = {
@@ -548,6 +559,7 @@
 				8AD5773023C3A1FD0072CDD7 /* Picture.swift in Sources */,
 				8AD5771E23C252790072CDD7 /* VerificationCodeController.swift in Sources */,
 				8A8D61F1240B247000203016 /* UIImage.swift in Sources */,
+				BFA46C3324CF362F009129F9 /* PushNotificationSender.swift in Sources */,
 				8AD5775A23C797970072CDD7 /* CustomAnimationPresentor.swift in Sources */,
 				BF35385324C7865300CC6F2E /* DiscountsController.swift in Sources */,
 				8AD5773C23C4CDDF0072CDD7 /* GroupRollCell.swift in Sources */,

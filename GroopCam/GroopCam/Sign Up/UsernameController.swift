@@ -68,6 +68,7 @@ class UsernameController: UIViewController, UITextFieldDelegate {
         activityIndicator.startAnimating()
         
         guard let username = usernameField.text else { return }
+        UserDefaults.standard.set(username, forKey: "username")
         let uid = UserDefaults.standard.string(forKey: "userid")
         let phoneNumber = self.phoneNumber
         

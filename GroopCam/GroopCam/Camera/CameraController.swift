@@ -339,8 +339,29 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             print("Successfully saved to post to DB")
         
         }
-    Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
+        Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
+        
+        sendNotificationToGroupUsers(userID, groupID, groupName)
     
+    }
+    
+    func sendNotificationToGroupUsers (_ userId: String, _ groupId: String, _ groupName: String) {
+        guard let username = UserDefaults.standard.string(forKey: "username") else { return }
+        Database.database().reference().child("members").child(groupId).observeSingleEvent(of: .value) {(snapshot) in
+            if let dictionary = snapshot.value as? [String:Bool] {
+                let uidArray = Array(dictionary.keys)
+                for eachUid in uidArray {
+                    if eachUid != userId {
+                        Database.database().reference().child("users").child(eachUid).child("token").observeSingleEvent(of: .value) {(snapshot) in
+                            if let value = snapshot.value as? String {
+                                let sender = PushNotificationSender()
+                                sender.sendPushNotification(to: value, body: "@\(username) posted a photo to \"\(groupName)\".")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     
@@ -469,7 +490,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         
         
         if #available(iOS 10.0, *) {
-            let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDuoCamera], mediaType: AVMediaType.video, position: .unspecified)
+            let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera], mediaType: AVMediaType.video, position: .unspecified)
             let devices = videoDeviceDiscoverySession.devices
             device = devices.first!
 
@@ -514,21 +535,37 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         }
     }
     
-    func flashOff(device:AVCaptureDevice)
-    {
+    func flashOff(device:AVCaptureDevice) {
         do{
             if (device.hasTorch){
                 try device.lockForConfiguration()
                 device.torchMode = .off
                 device.flashMode = .off
                 device.unlockForConfiguration()
-                
 //                self.flashButton.setImage(UIImage(named: "flashbutton")?.withRenderingMode(.alwaysOriginal), for: .normal)
 
             }
         } catch{
             //DISABEL FLASH BUTTON HERE IF ERROR
         }
+    }
+    
+    func getSettings(camera: AVCaptureDevice, flashMode: CurrentFlashMode) -> AVCapturePhotoSettings {
+        let settings = AVCapturePhotoSettings()
+        if camera.hasFlash {
+            switch flashMode {
+               case .auto: settings.flashMode = .auto
+               case .on: settings.flashMode = .on
+               default: settings.flashMode = .off
+            }
+        }
+        return settings
+    }
+    
+    enum CurrentFlashMode {
+        case off
+        case on
+        case auto
     }
     
 }
@@ -570,26 +607,26 @@ public extension UIImage {
         var transform = CGAffineTransform.identity
 
         switch imageOrientation {
-
         case .down, .downMirrored:
             transform = transform.translatedBy(x: size.width, y: size.height)
-            transform = transform.rotated(by: CGFloat(M_PI))
+            transform = transform.rotated(by: CGFloat(Double.pi))
 
         case .left, .leftMirrored:
             transform = transform.translatedBy(x: size.width, y: 0)
-            transform = transform.rotated(by: CGFloat(M_PI_2))
+            transform = transform.rotated(by: CGFloat(Double.pi/2))
 
         case .right, .rightMirrored:
             transform = transform.translatedBy(x: 0, y: size.height)
-            transform = transform.rotated(by: CGFloat(-M_PI_2))
+            transform = transform.rotated(by: CGFloat(-Double.pi/2))
 //            transform = transform.scaledBy(x: -1, y: 1)
             
         case .up, .upMirrored:
             break
+        @unknown default:
+            fatalError()
         }
 
         switch imageOrientation {
-
         case .upMirrored, .downMirrored:
             transform.translatedBy(x: size.width, y: 0)
             transform.scaledBy(x: -1, y: 1)
@@ -600,6 +637,8 @@ public extension UIImage {
 
         case .up, .down, .left, .right:
             break
+        @unknown default:
+            fatalError()
         }
 
         if let ctx = CGContext(data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: 0, space: cgImage.colorSpace!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) {

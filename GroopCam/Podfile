@@ -13,6 +13,7 @@ target 'GroopCam' do
   pod 'Firebase/Database'
   pod 'Firebase/Storage'
   pod 'Firebase/DynamicLinks'
+  pod 'Firebase/Messaging'
   pod 'Kingfisher', '~> 5.0'
   pod 'Stripe'
 #  pod 'Stripe/ApplePay'

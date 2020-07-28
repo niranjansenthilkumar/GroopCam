@@ -68,6 +68,15 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: UsernameController.updateUserFeedNotificationName, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: VerificationCodeController.updateLoggedNotificationName, object: nil)
+        
+        InstanceID.instanceID().instanceID { (result, error) in
+            if let error = error {
+                print("Error fetching remote instance ID: \(error)")
+            } else if let result = result {
+                print("Remote instance ID token: \(result.token)")
+                self.saveTokenToDB(result.token)
+            }
+        }
 
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
@@ -90,6 +99,11 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     @objc func handleUpdateFeed() {
         handleRefresh()
+    }
+    
+    func saveTokenToDB (_ token: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        Database.database().reference().child("users").child(uid).child("token").setValue(token)
     }
     
     @objc func handleRefresh() {

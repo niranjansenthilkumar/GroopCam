@@ -241,7 +241,7 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         print(members.count, "please")
         
         let groupMembers = [groupId: members]
-    Database.database().reference().child("members").updateChildValues(groupMembers) { (err, ref) in
+        Database.database().reference().child("members").updateChildValues(groupMembers) { (err, ref) in
                 if let err = err {
                     print("Failed to save group members into db:", err)
                     return
@@ -249,9 +249,10 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
 
                 print("Successfully saved group members to db")
 
-            }
+        }
         
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let username = UserDefaults.standard.string(forKey: "username") else {return}
        
         var uidsToUpdate = [uid]
         for contact in self.contactsToDisplay {
@@ -264,12 +265,25 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         let userGroups = [groupId: true]
        
         for currentuid in uidsToUpdate {
-        Database.database().reference().child("users").child(currentuid).child("groups").updateChildValues(userGroups) { (err, ref) in
+            Database.database().reference().child("users").child(currentuid).child("groups").updateChildValues(userGroups) { (err, ref) in
                 if let err = err {
                     print("Failed to append group to user", err)
                 }
                 else{
                     print("Successfully appended group to user")
+                }
+            }
+            if currentuid != uid {
+                Database.database().reference().child("users").child(currentuid).child("token").observeSingleEvent(of: .value) {(snapshot) in
+                    if let value = snapshot.value as? String {
+                        let sender = PushNotificationSender()
+                        if uidsToUpdate.count == 2 {
+                            sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\".")
+                        } else {
+                            sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\" with \(uidsToUpdate.count - 2) others.")
+                        }
+                        
+                    }
                 }
             }
         }
