@@ -116,6 +116,44 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
     var contactsToDisplay = [ContactToDisplay]()
     var fullContactsToDisplay = [ContactToDisplay]()
     
+    func sortAlphabeticalContacts(contact: ContactToDisplay) {
+        var index = 0
+        while index != self.contactsToDisplay.count && contact.username.lowercased() > self.contactsToDisplay[index].username.lowercased() {
+                      index+=1
+        }
+        self.contactsToDisplay.insert(contact, at: index)
+    }
+    
+    func sortAlphabeticalFullContacts(contact: ContactToDisplay) {
+        var index = 0
+        while index != self.fullContactsToDisplay.count && contact.username.lowercased() > self.fullContactsToDisplay[index].username.lowercased() {
+                      index+=1
+        }
+        self.fullContactsToDisplay.insert(contact, at: index)
+    }
+    
+    /* Testing sort
+    private func testSort() {
+        let fav1 = FavoritableContact(firstname: "Barty", lastname: "Crouch", phonenumber: "+13025561234", hasSelected: false)
+          
+        let fav2 = FavoritableContact(firstname: "Aania", lastname: "Safar", phonenumber: "+13025561156", hasSelected: false)
+          
+        let c1 = ContactToDisplay(firstname: "Barty", lastname: "Crouch", phonenumber: "+13025561234", hasSelected: false, uid: "1", username: "Barty123")
+          
+        let c2 = ContactToDisplay(firstname: "Aania", lastname: "Safar", phonenumber: "+13025561234", hasSelected: false, uid: "2", username: "aania")
+        
+        self.favoritableContacts.append(fav1)
+        self.favoritableContacts.append(fav2)
+                   
+        self.sortAlphabeticalContacts(contact: c1)
+        self.sortAlphabeticalContacts(contact: c2)
+                   
+        self.sortAlphabeticalFullContacts(contact: c1)
+        self.sortAlphabeticalFullContacts(contact: c2)
+        
+    }
+    */
+ 
     private func fetchContacts(){
         print("Attempting to fetch contacts today")
         
@@ -185,7 +223,7 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
             }
             
             print(self.favoritableContacts.count, "please")
-            
+        
             for contact in self.favoritableContacts {
                 Database.database().reference().child("contacts").observeSingleEvent(of: .value) { (snapshot) in
                     if snapshot.hasChild(contact.phonenumber){
@@ -294,7 +332,8 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
             self.navigationController?.popToRootViewController(animated: true)
 //            self.navigationController?.popViewController(animated: true)
             
-            NotificationCenter.default.post(name: UpdateFriendsController.updateAddFriendNotificationName, object: nil)
+        // Edited by Aliva - this is handled by viewDidAppear in MainController
+        // NotificationCenter.default.post(name: UpdateFriendsController.updateAddFriendNotificationName, object: nil)
 
         }
 

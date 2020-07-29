@@ -161,16 +161,13 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
 
     @objc func shareAction(){
         
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Share", style: .default , handler:{ (UIAlertAction)in
-                      print("User click Share Ext button")
+        print("User click Share Ext button")
 
-                  let imageData = self.photoImageView.asImage().jpegData(compressionQuality: 0.5)
-                 let shareExtVC = UIActivityViewController(activityItems: [imageData!], applicationActivities: [])
-                 self.present(shareExtVC, animated: true)
+        let imageData = self.photoImageView.asImage().jpegData(compressionQuality: 0.5)
+        let shareExtVC = UIActivityViewController(activityItems: [imageData!], applicationActivities: [])
+        self.present(shareExtVC, animated: true)
 
-               }))
+    }
         
         /*
                         
@@ -198,6 +195,7 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
 
         */
         
+       /*
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler:{ (UIAlertAction)in
             print("User click Dismiss button")
         
@@ -207,8 +205,7 @@ class PictureController: UIViewController, UIActionSheetDelegate, MFMessageCompo
         self.present(alert, animated: true, completion: {
             print("completion block")
         })
-        
-    }
+        */
     
     func sendText() {
             if (MFMessageComposeViewController.canSendText()) {
