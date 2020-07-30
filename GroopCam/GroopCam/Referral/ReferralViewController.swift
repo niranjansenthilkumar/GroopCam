@@ -73,11 +73,11 @@ class ReferralViewController: UIViewController {
     }
     
     @objc func toggleDiscounts() {
-        let discountVC = DiscountsController(collectionViewLayout: UICollectionViewFlowLayout())
-        self.navigationController?.pushNavBarWithTitle(vc: discountVC)
-        
-        self.navigationItem.leftItemsSupplementBackButton = true
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+//        let discountVC = DiscountsController(collectionViewLayout: UICollectionViewFlowLayout())
+//        self.navigationController?.pushNavBarWithTitle(vc: discountVC)
+//
+//        self.navigationItem.leftItemsSupplementBackButton = true
+//        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     func sendText() {

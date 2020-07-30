@@ -91,9 +91,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if let user = user {
                     let userRecord = Database.database().reference().child("users").child(user.user.uid)
                     userRecord.child("referred_by").setValue(invitedBy)
-                    let discountCode = self.generateDiscountCode()
-                    let discountRecord = Database.database().reference().child("discounts").child("\(invitedBy ?? "")").child(discountCode)
-                    discountRecord.setValue(true)
+//                    let discountCode = self.generateDiscountCode()
+//                    let discountRecord = Database.database().reference().child("discounts").child(discountCode)
+//                    discountRecord.setValue(5)
                     if dynamicLink.matchType == .weak {
                       // If the Dynamic Link has a weak match confidence, it is possible
                       // that the current device isn't the same device on which the invitation

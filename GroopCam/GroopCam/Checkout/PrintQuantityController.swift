@@ -57,7 +57,8 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     }()
     
     var hasDiscountCode = false
-    var discounts = [String]()
+    var discountValue = 0
+    
     
     override func viewDidLoad() {
         
@@ -147,20 +148,31 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     
     @objc func handleApply() {
         guard let discountCode = self.discountField.text else { return }
-        if let user = Auth.auth().currentUser {
+        if Auth.auth().currentUser != nil {
             self.showSpinner(onView: self.checkoutView)
-            Database.database().reference().child("discounts").child(user.uid).observeSingleEvent(of: .value, with: {(snapshot) in
+            Database.database().reference().child("discounts").observeSingleEvent(of: .value, with: {(snapshot) in
                 self.removeSpinner()
                 self.discountField.text = ""
-                guard let discountsDictionary = snapshot.value as? [String: Any] else {
+                guard let discountsDictionary = snapshot.value as? [String: Int] else {
                     self.presentAlert("Invalid Code!")
                     return
                 }
-                self.discounts = Array(discountsDictionary.keys)
-                for discount in self.discounts {
+                let discounts = Array(discountsDictionary.keys)
+                for discount in discounts {
                     if discountCode == discount {
+                        self.discountValue = discountsDictionary[discount]!
+                        if self.total < 5 {
+                            self.presentFailedCheckout()
+                        }
+                        if self.discountValue < self.total {
+                            self.presentAlert("This code doesn't have enough amount of free photos!")
+                            return
+                        } else if self.discountValue == self.total {
+                            self.removeDiscountCode(discount)
+                        } else {
+                            self.updateDiscountValue(discount, self.discountValue - self.total)
+                        }
                         self.hasDiscountCode = true
-                        self.removeDiscountCode(user.uid, discount)
                         self.presentAlert("Successfully applied discount code!")
                         return
                     }
@@ -170,8 +182,12 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         }
     }
     
-    func removeDiscountCode(_ userId: String, _ discountCode: String) {
-        Database.database().reference().child("discounts").child(userId).child(discountCode).removeValue()
+    func removeDiscountCode(_ discountCode: String) {
+        Database.database().reference().child("discounts").child(discountCode).removeValue()
+    }
+    
+    func updateDiscountValue(_ discountCode: String, _ amount: Int) {
+        Database.database().reference().child("discounts").child(discountCode).setValue(amount)
     }
     
     func sendEmail(_ desc: String) {
@@ -200,10 +216,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         if total < 5 {
             self.presentFailedCheckout()
         } else if hasDiscountCode {
-            if total > 5 {
-                self.presentAlert("You have only 5 free prints!")
-                return
-            }
             if !MFMailComposeViewController.canSendMail() {
                 self.presentAlert("Email service is not supported on this device!")
                 return
