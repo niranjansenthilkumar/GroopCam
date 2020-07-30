@@ -114,13 +114,12 @@ class GroupRollController: UICollectionViewController {
         collectionView?.refreshControl = refreshControl
         
         guard let groupId = self.group?.groupid else {return}
-        
-        //self.showSpinner(onView: self.collectionView)
 
         //fetchPostsWithGroupID(groupID: groupId)
-        self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
+
+        checkIfNoPosts(forGroup: groupId)
         observeNewPosts(forGroup: groupId)
-    
+        
         if groupCount == 1 {
             self.friendButton.setTitle(String(groupCount) + " friend 👥", for: .normal)
         }
@@ -179,6 +178,7 @@ class GroupRollController: UICollectionViewController {
         progressLabel.topAnchor.constraint(equalTo: viewProgress.topAnchor, constant: 20).isActive = true
         
         progress.completedUnitCount = 0
+        
     }
         
     func updateUploadProgress() {
@@ -255,19 +255,28 @@ class GroupRollController: UICollectionViewController {
 //        fetchPostsWithGroupID(groupID: groupId, isInitialLoad: false)
 //    }
     
-    
     var posts = [Picture]()
     
+    func checkIfNoPosts(forGroup groupId: String) {
+        Database.database().reference().child("posts").child(groupId).observeSingleEvent(of: .value) { (snapshot) in
+            if (!snapshot.exists()) {
+                print("Group contains no pictures")
+                self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
+            }
+            else {
+                print("Group contains pictures")
+                self.collectionView.setEmptyMessage("")
+            }
+        }
+    }
     
     func observeNewPosts(forGroup groupId: String) {
-        
         Database.database().reference().child("posts").child(groupId).observe(.childAdded) { (snapshot) in
             guard let dictionary = snapshot.value as? [String:Any] else {
                 return
             }
-            
-            //print("Dict is: \(dictionary)")
-            
+            // print("Dict is: \(dictionary)")
+    
             let key = snapshot.key
             
             let userIDToAdd = dictionary["userid"] as? String ?? ""
@@ -287,11 +296,9 @@ class GroupRollController: UICollectionViewController {
                 isHorizontal = isExistingImageHorizontal
             }
             
-            
             let imageURLToAdd = imageURL as? String ?? ""
             
             Database.database().reference().child("users").child(userIDToAdd).observeSingleEvent(of: .value) { (usersnapshot) in
-                
                 guard let userDictionary = usersnapshot.value as? [String: Any] else { return }
                 
                 let usernameToAdd = userDictionary["username"] as? String ?? ""
@@ -325,16 +332,12 @@ class GroupRollController: UICollectionViewController {
                 
                 self.collectionView.reloadData()
                 self.removeSpinner()
-                if self.posts.count == 0 {
-                    self.collectionView.setEmptyMessage("hmm no pics yet. 🤔 ")
-                }
-                else {
+                if self.posts.count != 0 {
                     self.collectionView.setEmptyMessage("")
                 }
             }
         }
-        
-//        Database.database().reference().child("posts").child(groupId).observeSingleEvent(of: .value) { (snapshot) in
+//       Database.database().reference().child("posts").child(groupId).observeSingleEvent(of: .value) { (snapshot) in
 //            print("All children are iterated")
 //        }
     }
