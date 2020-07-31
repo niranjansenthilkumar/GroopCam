@@ -11,9 +11,7 @@
 @interface NSMutableURLRequest (Stripe)
 
 - (void)stp_addParametersToURL:(NSDictionary *)parameters;
-- (void)stp_setFormPayload:(NSDictionary *)formPayload;
-- (void)stp_setMultipartFormData:(NSData *)data boundary:(NSString *)boundary;
 
 @end
 
-void linkNSMutableURLRequestCategory(void);
+void linkURLRequestCategory(void);
