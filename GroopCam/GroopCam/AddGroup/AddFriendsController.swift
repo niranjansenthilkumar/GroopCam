@@ -131,56 +131,56 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
     }
     
     /* Testing sort
-    private func testSort() {
-        let fav1 = FavoritableContact(firstname: "Barty", lastname: "Crouch", phonenumber: "+13025561234", hasSelected: false)
-          
-        let fav2 = FavoritableContact(firstname: "Aania", lastname: "Safar", phonenumber: "+13025561156", hasSelected: false)
-          
-        let c1 = ContactToDisplay(firstname: "Barty", lastname: "Crouch", phonenumber: "+13025561234", hasSelected: false, uid: "1", username: "123Barty")
-          
-        let c2 = ContactToDisplay(firstname: "Aania", lastname: "Safar", phonenumber: "+13025561234", hasSelected: false, uid: "2", username: "aania")
-        
-        self.favoritableContacts.append(fav1)
-        self.favoritableContacts.append(fav2)
-                   
-        self.sortAlphabeticalContacts(contact: c1)
-        self.sortAlphabeticalContacts(contact: c2)
-                   
-        self.sortAlphabeticalFullContacts(contact: c1)
-        self.sortAlphabeticalFullContacts(contact: c2)
-        
-    }
- */
- 
+       private func testSort() {
+           let fav1 = FavoritableContact(firstname: "Barty", lastname: "Crouch", phonenumber: "+13025561234", hasSelected: false)
+             
+           let fav2 = FavoritableContact(firstname: "Aania", lastname: "Safar", phonenumber: "+13025561156", hasSelected: false)
+             
+           let c1 = ContactToDisplay(firstname: "Barty", lastname: "Crouch", phonenumber: "+13025561234", hasSelected: false, uid: "1", username: "123Barty")
+             
+           let c2 = ContactToDisplay(firstname: "Aania", lastname: "Safar", phonenumber: "+13025561234", hasSelected: false, uid: "2", username: "aania")
+           
+           self.favoritableContacts.append(fav1)
+           self.favoritableContacts.append(fav2)
+                      
+           self.sortAlphabeticalContacts(contact: c1)
+           self.sortAlphabeticalContacts(contact: c2)
+                      
+           self.sortAlphabeticalFullContacts(contact: c1)
+           self.sortAlphabeticalFullContacts(contact: c2)
+           
+       }
+    */
+    
     private func fetchContacts(){
         print("Attempting to fetch contacts today")
-        
+            
         let store = CNContactStore()
-        
+            
         store.requestAccess(for: .contacts) { (granted, err) in
             if let err = err {
                 print("Failed to request access:", err)
                 return
             }
-            
+                
             if granted {
                 print("Access granted")
-                
+                    
                 let keys = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactPhoneNumbersKey]
                 let request = CNContactFetchRequest(keysToFetch: keys as [CNKeyDescriptor])
-                
+                    
                 do{
-                    
+                        
 //                    var favoritableContacts = [FavoritableContact]()
-                    
+                        
                     try store.enumerateContacts(with: request) { (contact, stopPointerIfYouWantToStopEnumerating) in
-                        
+                            
 //                        print(contact.givenName + " " + contact.familyName)
-                        
+                            
                         var ogphoneNumber = contact.phoneNumbers.first?.value.stringValue ?? ""
-                        
+                            
                         var phoneNumber = ogphoneNumber.components(separatedBy:CharacterSet.decimalDigits.inverted).joined()
-                                                
+                                                    
                         if phoneNumber.count == 10 {
 //                            print("+1" + phoneNumber)
                             phoneNumber = "+1" + phoneNumber
@@ -192,56 +192,56 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
                         else{
                             phoneNumber = "+" + phoneNumber
                         }
-                        
+                            
                         let favContact = FavoritableContact(firstname: contact.givenName, lastname: contact.familyName, phonenumber: phoneNumber, hasSelected: false)
                         self.favoritableContacts.append(favContact)
                     }
-                    
+                        
 
                 } catch let err{
                     print("Failed to enumerate contacts:", err)
                 }
-                
+                    
             } else {
                 print("Access denied...")
             }
-            
+                
             print(self.favoritableContacts.count, "please")
-                    
+                        
             for contact in self.favoritableContacts {
                 Database.database().reference().child("contacts").observeSingleEvent(of: .value) { (snapshot) in
                     if snapshot.hasChild(contact.phonenumber){
                         print("phonenumber exists")
-                        
-                    Database.database().reference().child("contacts").child(contact.phonenumber).observeSingleEvent(of: .value) { (snapshot) in
-                        if let value = snapshot.value as? [String: Any] {
-                            guard let uid = value["uid"] else {return}
-                            guard let username = value["username"] else {return}
                             
-//                            print(uid, "please")
-//                            print(username, "please")
-                            let uidToAdd = uid as? String ?? ""
-                            let usernameToAdd = username as? String ?? ""
-                            //dont add current user
-                            if uidToAdd != Auth.auth().currentUser?.uid {
-                                let contact = ContactToDisplay(firstname: contact.firstname, lastname: contact.lastname, phonenumber: contact.phonenumber, hasSelected: false, uid: uidToAdd, username: usernameToAdd)
+                        Database.database().reference().child("contacts").child(contact.phonenumber).observeSingleEvent(of: .value) { (snapshot) in
+                            if let value = snapshot.value as? [String: Any] {
+                                guard let uid = value["uid"] else {return}
+                                guard let username = value["username"] else {return}
                                 
-                                //self.contactsToDisplay.append(contact)
-                                self.sortAlphabeticalContacts(contact: contact)
-                                self.tableView.reloadData()
-                            }
-                            //fullcontacts
-                            let contact = ContactToDisplay(firstname: contact.firstname, lastname: contact.lastname, phonenumber: contact.phonenumber, hasSelected: false, uid: uidToAdd, username: usernameToAdd)
-                            self.sortAlphabeticalFullContacts(contact: contact)
-                            
+//                                print(uid, "please")
+//                                print(username, "please")
+                                let uidToAdd = uid as? String ?? ""
+                                let usernameToAdd = username as? String ?? ""
+                                //dont add current user
+                                if uidToAdd != Auth.auth().currentUser?.uid {
+                                    let contact = ContactToDisplay(firstname: contact.firstname, lastname: contact.lastname, phonenumber: contact.phonenumber, hasSelected: false, uid: uidToAdd, username: usernameToAdd)
+                                    
+                                    //self.contactsToDisplay.append(contact)
+                                    self.sortAlphabeticalContacts(contact: contact)
+                                    self.tableView.reloadData()
+                                }
+                                //fullcontacts
+                                let contact = ContactToDisplay(firstname: contact.firstname, lastname: contact.lastname, phonenumber: contact.phonenumber, hasSelected: false, uid: uidToAdd, username: usernameToAdd)
+                                self.sortAlphabeticalFullContacts(contact: contact)
+                                
                             }
                         }
-                        
+                            
                     }
                 }
             }
         }
-        
+            
     }
     
     static let updateFeedNotificationName = NSNotification.Name(rawValue: "UpdateFeed")
@@ -284,7 +284,7 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         print(members.count, "please")
         
         let groupMembers = [groupId: members]
-    Database.database().reference().child("members").updateChildValues(groupMembers) { (err, ref) in
+        Database.database().reference().child("members").updateChildValues(groupMembers) { (err, ref) in
                 if let err = err {
                     print("Failed to save group members into db:", err)
                     return
@@ -292,9 +292,10 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
 
                 print("Successfully saved group members to db")
 
-            }
+        }
         
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let username = UserDefaults.standard.string(forKey: "username") else {return}
        
         var uidsToUpdate = [uid]
         for contact in self.contactsToDisplay {
@@ -307,7 +308,7 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
         let userGroups = [groupId: true]
        
         for currentuid in uidsToUpdate {
-        Database.database().reference().child("users").child(currentuid).child("groups").updateChildValues(userGroups) { (err, ref) in
+            Database.database().reference().child("users").child(currentuid).child("groups").updateChildValues(userGroups) { (err, ref) in
                 if let err = err {
                     print("Failed to append group to user", err)
                 }
@@ -315,11 +316,23 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
                     print("Successfully appended group to user")
                 }
             }
+            if currentuid != uid {
+                Database.database().reference().child("users").child(currentuid).child("token").observeSingleEvent(of: .value) {(snapshot) in
+                    if let value = snapshot.value as? String {
+                        let sender = PushNotificationSender()
+                        if uidsToUpdate.count == 2 {
+                            sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\".")
+                        } else {
+                            sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\" with \(uidsToUpdate.count - 2) others.")
+                        }
+                        
+                    }
+                }
+            }
         }
         
         self.navigationController?.popToRootViewController(animated: true)
-   //   Edit by Aliva - handled by viewWillAppear in MainController
-   //     NotificationCenter.default.post(name: AddFriendsController.updateFeedNotificationName, object: nil)
+//        NotificationCenter.default.post(name: AddFriendsController.updateFeedNotificationName, object: nil)
 
     }
 
@@ -350,7 +363,7 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
     fileprivate func setupSearchBar(){
 
         searchController.searchResultsUpdater = self
-        searchController.dimsBackgroundDuringPresentation = false
+        searchController.obscuresBackgroundDuringPresentation = false
         definesPresentationContext = true
         self.searchController.searchBar.isTranslucent = false
         self.searchController.searchBar.backgroundImage = UIImage()
@@ -362,11 +375,8 @@ class AddFriendsController: UITableViewController, UISearchResultsUpdating {
             searchController.searchBar.searchTextField.backgroundColor = Theme.whiteopacity
             searchController.searchBar.searchTextField.placeholder = "Search by username"
             searchController.searchBar.searchTextField.textColor = Theme.lgColor
-
-        } else {
-            // Fallback on earlier versions
         }
-        
+
         if let textFieldInsideSearchBar = searchController.searchBar.value(forKey: "searchField") as? UITextField,
             let glassIconView = textFieldInsideSearchBar.leftView as? UIImageView {
                 //Magnifying glass

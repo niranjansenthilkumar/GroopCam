@@ -1154,6 +1154,14 @@ extension GroupRollController {
             print("All Images have been uploaded.")
             arrImages.removeAll()
             self.collectionView.setEmptyMessage("")
+            
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            guard let groupId = self.group?.groupid else {return}
+            
+            guard let groupName = self.group?.groupname else {return}
+            
+            sendNotificationToGroupUsers(uid, groupId, groupName)
 
             //enableViews()
             //resetUploadProgress()
@@ -1179,6 +1187,25 @@ extension GroupRollController {
         }
         
     Database.database().reference().child("groups").child(groupID).child("lastPicture").setValue(String(Date().timeIntervalSince1970))
+    }
+    
+    func sendNotificationToGroupUsers (_ userId: String, _ groupId: String, _ groupName: String) {
+        guard let username = UserDefaults.standard.string(forKey: "username") else { return }
+        Database.database().reference().child("members").child(groupId).observeSingleEvent(of: .value) {(snapshot) in
+            if let dictionary = snapshot.value as? [String:Bool] {
+                let uidArray = Array(dictionary.keys)
+                for eachUid in uidArray {
+                    if eachUid != userId {
+                        Database.database().reference().child("users").child(eachUid).child("token").observeSingleEvent(of: .value) {(snapshot) in
+                            if let value = snapshot.value as? String {
+                                let sender = PushNotificationSender()
+                                sender.sendPushNotification(to: value, body: "@\(username) uploaded images to \"\(groupName)\".")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     func showActivityIndicator() {

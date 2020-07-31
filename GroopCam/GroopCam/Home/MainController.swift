@@ -5,6 +5,7 @@
 //  Created by Niranjan Senthilkumar on 1/5/20.
 //  Copyright © 2020 NJ. All rights reserved.
 //
+
 import UIKit
 import Firebase
 import FirebaseAuth
@@ -18,9 +19,11 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     override func viewDidLoad() {
         super.viewDidLoad()
         
+                
         collectionView?.register(GroupCell.self, forCellWithReuseIdentifier: cellId)
+        
         layoutViews()
-
+        
         if Auth.auth().currentUser == nil {
             //show if not logged in
             DispatchQueue.main.async {
@@ -34,9 +37,30 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 navController.modalPresentationStyle = .fullScreen
                 self.present(navController, animated: true, completion: nil)
             }
+            
             return
+        } else {
+            let userid = Auth.auth().currentUser?.uid ?? ""
+            Database.database().reference().child("users").child("\(userid)").observeSingleEvent(of: .value, with: { (snapshot) in
+                if snapshot.hasChild("referred_by") {
+                    DispatchQueue.main.async {
+                        let viewController = ViewController()
+                        let navController = UINavigationController(rootViewController: viewController)
+                        navController.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+                        navController.navigationBar.shadowImage = UIImage()
+                        navController.navigationBar.isTranslucent = true
+                        navController.view.backgroundColor = UIColor.clear
+                        navController.modalPresentationStyle = .fullScreen
+                        self.present(navController, animated: true, completion: nil)
+                    }
+                    return
+                }
+            })
+            
         }
-                
+        
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: AddFriendsController.updateFeedNotificationName, object: nil)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: FriendsController.updateFriendNotificationName, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: UpdateFriendsController.updateAddFriendNotificationName, object: nil)
@@ -44,13 +68,22 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: UsernameController.updateUserFeedNotificationName, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: VerificationCodeController.updateLoggedNotificationName, object: nil)
+        
+        InstanceID.instanceID().instanceID { (result, error) in
+            if let error = error {
+                print("Error fetching remote instance ID: \(error)")
+            } else if let result = result {
+                print("Remote instance ID token: \(result.token)")
+                self.saveTokenToDB(result.token)
+            }
+        }
 
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         collectionView?.refreshControl = refreshControl
 
-        //Z: Fix for groups not getting loaded initially
-        //fetchAllGroups()
+        fetchAllGroups()
+        
     }
     
     var bool: Bool = false
@@ -62,13 +95,15 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-           handleUpdateFeed()
-       }
     
     
     @objc func handleUpdateFeed() {
         handleRefresh()
+    }
+    
+    func saveTokenToDB (_ token: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        Database.database().reference().child("users").child(uid).child("token").setValue(token)
     }
     
     @objc func handleRefresh() {
@@ -81,7 +116,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     var groups = [Group]()
     fileprivate func fetchAllGroups(){
         fetchGroups()
-        //self.collectionView.reloadData()
+        self.collectionView.reloadData()
     }
     
     func fetchGroups(){
@@ -100,20 +135,13 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
     fileprivate func fetchGroupsWithUser(user: User){
 //        print(user.groups, "please")
-        
-        self.groups.removeAll()
         username = user.username
                 
         if user.groups.count == 0 {
             self.removeSpinner()
-            //self.collectionView.reloadData()
-            
-            //Z: Fix for groups not getting loaded initially
-            self.collectionView.setEmptyMessage("No group rolls yet! 😔 click new group to start a roll. 📸")
+            self.collectionView.reloadData()
             return
         }
-        
-        self.collectionView.setEmptyMessage("")
 
         for group in user.groups {
 //            print(group, "please")
@@ -121,6 +149,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //            print(group.key, "please")
             Database.database().reference().child("groups").child(group.key).observeSingleEvent(of: .value) { (snapshot) in
 //                print(snapshot.value, "please")
+
                 if let value = snapshot.value as? [String: Any] {
                     guard let indgroupName = value["groupname"] else {return}
                     guard let indlastPicture = value["lastPicture"] else {return}
@@ -136,6 +165,10 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 }
                 
             Database.database().reference().child("members").child(group.key).observeSingleEvent(of: .value) { (snapshot) in
+    //                print(snapshot.value, "please")
+                    
+//                    self.collectionView?.refreshControl?.endRefreshing()
+
                     if let value = snapshot.value as? [String: Any] {
                         print(value.count, "please")
                         let group = Group(groupid: group.key, groupname: groupInfo[0] as! String, lastPicture: groupInfo[1] as! String, creationDate: groupInfo[2] as! String, members: value, pics: [])
@@ -174,22 +207,19 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         return interval
     }
     
-    //Z: Fix for groups not getting loaded initially
-//    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//
-//        if (self.groups.count == 0) {
-//            self.collectionView.setEmptyMessage("No group rolls yet! 😔 click new group to start a roll. 📸")
-//        } else {
-//            self.collectionView.restore()
-//        }
-//
-//        return self.groups.count
-//    }
-    
-    //Z: Fix for groups not getting loaded initially
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        if (self.groups.count == 0) {
+            self.collectionView.setEmptyMessage("No group rolls yet! 😔 click new group to start a roll. 📸")
+        } else {
+            self.collectionView.restore()
+        }
+        
         return self.groups.count
+
+        
     }
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
@@ -206,25 +236,22 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! GroupCell
         
-        if indexPath.row <= groups.count {
-            let group = self.groups[indexPath.row]
-            
-            cell.label.text = group.groupname
-                    
-            
-            let timeString = parseDuration(group.lastPicture)
-            let date = Date(timeIntervalSince1970: parseDuration(group.lastPicture))
-            
-            
-            cell.recentLabel.text = "Active " + date.timeAgoDisplay()
-            cell.groupNumberLabel.text = String(group.members.count)
-            cell.cameraButton.tag = indexPath.row
-            cell.cameraButton.addTarget(self, action: #selector(handleCamera(sender:)), for: .touchUpInside)
-            
-            cell.optionsButton.tag = indexPath.row
-            cell.optionsButton.addTarget(self, action: #selector(handleDelete(sender:)), for: .touchUpInside)
-
-        }
+        let group = self.groups[indexPath.row]
+        
+        cell.label.text = group.groupname
+                
+        
+        let timeString = parseDuration(group.lastPicture)
+        let date = Date(timeIntervalSince1970: parseDuration(group.lastPicture))
+        
+        
+        cell.recentLabel.text = "Active " + date.timeAgoDisplay()
+        cell.groupNumberLabel.text = String(group.members.count)
+        cell.cameraButton.tag = indexPath.row
+        cell.cameraButton.addTarget(self, action: #selector(handleCamera(sender:)), for: .touchUpInside)
+        
+        cell.optionsButton.tag = indexPath.row
+        cell.optionsButton.addTarget(self, action: #selector(handleDelete(sender:)), for: .touchUpInside)
         
         return cell
     }
@@ -232,25 +259,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     @objc func handleDelete(sender: UIButton){
         
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        alert.addAction(UIAlertAction(title: "Edit Group Name", style: .default , handler:{ (UIAlertAction)in
-                   print("User click edit group button")
-        
-                   let data = self.groups[sender.tag]
-                   let groupId = data.groupid
-                   let lastPic = data.lastPicture
-                   let timeStamp = data.creationDate
-           
-                   let editGroupVC = EditGroupController()
-                   editGroupVC.groupId = groupId
-                   editGroupVC.lastPic = lastPic
-                   editGroupVC.timeStamp = timeStamp
-                   self.navigationController?.pushNavBar(vc: editGroupVC)
-                          
-                   self.navigationItem.leftItemsSupplementBackButton = true
-                   self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-                   
-               }))
                 
         alert.addAction(UIAlertAction(title: "Leave Group", style: .destructive , handler:{ (UIAlertAction)in
             print("User click leave button")
@@ -283,7 +291,6 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 
         self.present(alert, animated: true, completion: {
             print("completion block")
-            
         })    }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -291,7 +298,9 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
         groupRollVC.group = self.groups[indexPath.row]
         groupRollVC.username = self.username
         groupRollVC.groupCount = self.groups[indexPath.row].members.count
+        
         self.navigationController?.pushNavBarWithTitle(vc: groupRollVC)
+        
         self.navigationItem.leftItemsSupplementBackButton = true
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
@@ -436,6 +445,14 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //        self.navigationItem.setBackImageEmpty()
     }
     
+    @objc func handleFreePrints(){
+        let referralVC = ReferralViewController()
+        self.navigationController?.pushNavBar(vc: referralVC)
+        
+        self.navigationItem.leftItemsSupplementBackButton = true
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    
     @objc func handleCamera(sender: UIButton){
         
         let data = self.groups[sender.tag]
@@ -470,7 +487,7 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
 //        navigationController?.navigationBar.isTranslucent = true
 //        navigationController?.navigationBar.barTintColor = Theme.lgColor
         self.navigationController?.navigationBar.topItem?.title = "Group Rolls"
-//
+
         self.navigationController?.navigationBar.isTranslucent = false
         self.navigationController?.navigationBar.barTintColor = Theme.backgroundColor
 
@@ -479,10 +496,14 @@ class MainController: UICollectionViewController, UICollectionViewDelegateFlowLa
     
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
-//        self.navigationController?.navigationBar.topItem?.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
+        let settingsButton = UIBarButtonItem(image: UIImage(named: "settingsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(toggleSettings))
+        let freePrintsButton = UIBarButtonItem(image: UIImage(named: "freeprintsicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleFreePrints))
         
-        self.navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "newgroupicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleNewGroup))
+        self.navigationItem.leftBarButtonItems = [settingsButton, freePrintsButton]
+
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "newgroupicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleNewGroup))
+        
+//        self.navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "newgroupicon")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleNewGroup))
     
     }
 }
@@ -496,7 +517,7 @@ extension Database {
 //            let user = User(uid: uid, dictionary: userDictionary)
             
             let groups = userDictionary["groups"] as? [String : Any] ?? [:]
-            
+                        
             let user = User(uid: uid, username: userDictionary["username"] as! String, phonenumber: userDictionary["phonenumber"] as! String, groups: groups)
             completion(user)
             

@@ -12,5 +12,5 @@
 //
 //#endif /* ApplePaySwag_Bridging_Header_h */
 
-#import <Stripe/Stripe.h>
-#import <Stripe/Stripe+ApplePay.h>
+//#import <Stripe/Stripe.h>
+//#import <Stripe/Stripe+ApplePay.h>
