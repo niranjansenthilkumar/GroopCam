@@ -66,10 +66,11 @@
 		8AD5775A23C797970072CDD7 /* CustomAnimationPresentor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD5775923C797970072CDD7 /* CustomAnimationPresentor.swift */; };
 		8AD5775C23C797D80072CDD7 /* PreviewPhotoContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD5775B23C797D80072CDD7 /* PreviewPhotoContainer.swift */; };
 		8AD5776123CBAED60072CDD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AD5776023CBAED50072CDD7 /* GoogleService-Info.plist */; };
-		BF41A20024D4C24200D98750 /* ReferralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF41A1FF24D4C24200D98750 /* ReferralViewController.swift */; };
-		BF41A20424D4C27000D98750 /* DiscountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF41A20224D4C27000D98750 /* DiscountCell.swift */; };
-		BF41A20524D4C27000D98750 /* DiscountsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF41A20324D4C27000D98750 /* DiscountsController.swift */; };
-		BF41A20824D4C28500D98750 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF41A20724D4C28500D98750 /* PushNotificationSender.swift */; };
+		BFBC10F824D8557000AD1C18 /* ReferralViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBC10F724D8557000AD1C18 /* ReferralViewController.swift */; };
+		BFBC10FB24D8558700AD1C18 /* DiscountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBC10F924D8558700AD1C18 /* DiscountCell.swift */; };
+		BFBC10FC24D8558700AD1C18 /* DiscountsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBC10FA24D8558700AD1C18 /* DiscountsController.swift */; };
+		BFBC10FE24D855CF00AD1C18 /* EmojiCheckoutCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBC10FD24D855CF00AD1C18 /* EmojiCheckoutCell.swift */; };
+		BFBC110024D855E400AD1C18 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFBC10FF24D855E400AD1C18 /* PushNotificationSender.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -136,10 +137,11 @@
 		8AD5775F23CB9D1B0072CDD7 /* GroopCam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GroopCam.entitlements; sourceTree = "<group>"; };
 		8AD5776023CBAED50072CDD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		944D472F9EF9E5A41A141F24 /* Pods-GroopCam.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroopCam.release.xcconfig"; path = "Target Support Files/Pods-GroopCam/Pods-GroopCam.release.xcconfig"; sourceTree = "<group>"; };
-		BF41A1FF24D4C24200D98750 /* ReferralViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReferralViewController.swift; sourceTree = "<group>"; };
-		BF41A20224D4C27000D98750 /* DiscountCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscountCell.swift; sourceTree = "<group>"; };
-		BF41A20324D4C27000D98750 /* DiscountsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscountsController.swift; sourceTree = "<group>"; };
-		BF41A20724D4C28500D98750 /* PushNotificationSender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
+		BFBC10F724D8557000AD1C18 /* ReferralViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReferralViewController.swift; path = GroopCam/Referral/ReferralViewController.swift; sourceTree = SOURCE_ROOT; };
+		BFBC10F924D8558700AD1C18 /* DiscountCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DiscountCell.swift; path = GroopCam/Discounts/DiscountCell.swift; sourceTree = SOURCE_ROOT; };
+		BFBC10FA24D8558700AD1C18 /* DiscountsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DiscountsController.swift; path = GroopCam/Discounts/DiscountsController.swift; sourceTree = SOURCE_ROOT; };
+		BFBC10FD24D855CF00AD1C18 /* EmojiCheckoutCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmojiCheckoutCell.swift; sourceTree = "<group>"; };
+		BFBC10FF24D855E400AD1C18 /* PushNotificationSender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PushNotificationSender.swift; path = GroopCam/FCM/PushNotificationSender.swift; sourceTree = SOURCE_ROOT; };
 		D7DC9676F3A1D2A406E8BA34 /* Pods-GroopCam.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GroopCam.debug.xcconfig"; path = "Target Support Files/Pods-GroopCam/Pods-GroopCam.debug.xcconfig"; sourceTree = "<group>"; };
 		FF0530E6F2E09E108A5815EB /* Pods_GroopCam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GroopCam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -181,6 +183,7 @@
 				8A8D61D6240B247000203016 /* CheckoutViewController.swift */,
 				8A8D61D7240B247000203016 /* Buttons.swift */,
 				8A8D61D8240B247000203016 /* MyAPIClient.swift */,
+				BFBC10FD24D855CF00AD1C18 /* EmojiCheckoutCell.swift */,
 				8A8D61D9240B247000203016 /* UIExtensions */,
 				8A8D61E4240B247000203016 /* CheckoutRowView.swift */,
 				8A8D61E5240B247000203016 /* PaymentContextFooterView.swift */,
@@ -376,7 +379,7 @@
 		BF41A1FE24D4C24200D98750 /* Referral */ = {
 			isa = PBXGroup;
 			children = (
-				BF41A1FF24D4C24200D98750 /* ReferralViewController.swift */,
+				BFBC10F724D8557000AD1C18 /* ReferralViewController.swift */,
 			);
 			name = Referral;
 			path = ../../Project/GroopCam/GroopCam/GroopCam/Referral;
@@ -385,8 +388,8 @@
 		BF41A20124D4C27000D98750 /* Discounts */ = {
 			isa = PBXGroup;
 			children = (
-				BF41A20224D4C27000D98750 /* DiscountCell.swift */,
-				BF41A20324D4C27000D98750 /* DiscountsController.swift */,
+				BFBC10F924D8558700AD1C18 /* DiscountCell.swift */,
+				BFBC10FA24D8558700AD1C18 /* DiscountsController.swift */,
 			);
 			name = Discounts;
 			path = ../../Project/GroopCam/Sourcetree/GroopCam/GroopCam/GroopCam/Discounts;
@@ -395,7 +398,7 @@
 		BF41A20624D4C28500D98750 /* FCM */ = {
 			isa = PBXGroup;
 			children = (
-				BF41A20724D4C28500D98750 /* PushNotificationSender.swift */,
+				BFBC10FF24D855E400AD1C18 /* PushNotificationSender.swift */,
 			);
 			name = FCM;
 			path = ../../Project/GroopCam/Sourcetree/GroopCam/GroopCam/GroopCam/FCM;
@@ -531,7 +534,7 @@
 				8AD5772C23C3A1D80072CDD7 /* Group.swift in Sources */,
 				8AD5773423C3A3120072CDD7 /* CreateGroupController.swift in Sources */,
 				8A8D61EF240B247000203016 /* String.swift in Sources */,
-				BF41A20524D4C27000D98750 /* DiscountsController.swift in Sources */,
+				BFBC10F824D8557000AD1C18 /* ReferralViewController.swift in Sources */,
 				8AD5773623C3A8CB0072CDD7 /* AddFriendsController.swift in Sources */,
 				8A8D61D42409EF0900203016 /* StripeClient.swift in Sources */,
 				8AD5773823C3B2E20072CDD7 /* CustomTableCell.swift in Sources */,
@@ -559,28 +562,29 @@
 				8AD5772223C2596E0072CDD7 /* MainController.swift in Sources */,
 				36F8E37724A3BAFB00E80786 /* CustomLayout.swift in Sources */,
 				8AD5770523C1E8590072CDD7 /* SceneDelegate.swift in Sources */,
-				BF41A20024D4C24200D98750 /* ReferralViewController.swift in Sources */,
 				8A8D61EA240B247000203016 /* UIScrollView.swift in Sources */,
+				BFBC110024D855E400AD1C18 /* PushNotificationSender.swift in Sources */,
 				8A8D61ED240B247000203016 /* UIColor.swift in Sources */,
 				8A8D61F4240B247000203016 /* CheckoutRowView.swift in Sources */,
 				367600F0249E596C0087DF58 /* FirebaseFilesUpload.swift in Sources */,
 				8AD5773E23C4CE320072CDD7 /* CustomImageView.swift in Sources */,
 				8AD5772E23C3A1E90072CDD7 /* User.swift in Sources */,
+				BFBC10FB24D8558700AD1C18 /* DiscountCell.swift in Sources */,
 				8AD5771823C1E86D0072CDD7 /* Extensions.swift in Sources */,
 				8A8D61E8240B247000203016 /* Buttons.swift in Sources */,
 				8AD5775323C724BE0072CDD7 /* ItemCell.swift in Sources */,
 				8AD5773023C3A1FD0072CDD7 /* Picture.swift in Sources */,
-				BF41A20824D4C28500D98750 /* PushNotificationSender.swift in Sources */,
 				8AD5771E23C252790072CDD7 /* VerificationCodeController.swift in Sources */,
 				8A8D61F1240B247000203016 /* UIImage.swift in Sources */,
 				8AD5775A23C797970072CDD7 /* CustomAnimationPresentor.swift in Sources */,
 				8AD5773C23C4CDDF0072CDD7 /* GroupRollCell.swift in Sources */,
 				8A8D61EB240B247000203016 /* Date.swift in Sources */,
-				BF41A20424D4C27000D98750 /* DiscountCell.swift in Sources */,
 				8A8D61EC240B247000203016 /* UIView.swift in Sources */,
+				BFBC10FC24D8558700AD1C18 /* DiscountsController.swift in Sources */,
 				8AD5774423C5F0900072CDD7 /* PictureController.swift in Sources */,
 				8AD5775C23C797D80072CDD7 /* PreviewPhotoContainer.swift in Sources */,
 				8AD5775823C797730072CDD7 /* CustomAnimationDismisser.swift in Sources */,
+				BFBC10FE24D855CF00AD1C18 /* EmojiCheckoutCell.swift in Sources */,
 				8AD5775623C797230072CDD7 /* CameraController.swift in Sources */,
 				8A8D61F3240B247000203016 /* Double.swift in Sources */,
 				8AD5772023C255510072CDD7 /* UsernameController.swift in Sources */,

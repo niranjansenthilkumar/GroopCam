@@ -16,8 +16,8 @@ class CheckoutViewController: UIViewController {
     // the instructions (don't worry, it's free). Replace nil on the line below with your
     // Heroku URL (it looks like https://blazing-sunrise-1234.herokuapp.com ).
     
-    var backendBaseURL: String? = "https://groopcamstripe2.herokuapp.com/"
-//    var backendBaseURL: String? = "https://groopcamios.herokuapp.com/"
+//    var backendBaseURL: String? = "https://groopcamstripe2.herokuapp.com"
+    var backendBaseURL: String? = "https://groopcamios.herokuapp.com/"
 
     // 3) Optionally, to enable Apple Pay, follow the instructions at https://stripe.com/docs/mobile/apple-pay
     // to create an Apple Merchant ID. Replace nil on the line below with it (it looks like merchant.com.yourappname).
@@ -33,6 +33,7 @@ class CheckoutViewController: UIViewController {
     let tableView: UITableView
     let paymentRow: CheckoutRowView
     let shippingRow: CheckoutRowView?
+    let discountRow: CheckoutRowView
     let totalRow: CheckoutRowView
     let buyButton: BuyButton
     let rowHeight: CGFloat = 52
@@ -41,6 +42,7 @@ class CheckoutViewController: UIViewController {
     let country: String
     var products: [QuantityObject]
     var total = 0
+    var hasDiscount = false
     var paymentInProgress: Bool = false {
         didSet {
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn, animations: {
@@ -57,9 +59,10 @@ class CheckoutViewController: UIViewController {
         }
     }
     
-    init(products: [QuantityObject], settings: Settings) {
+    init(products: [QuantityObject], settings: Settings, hasDiscount: Bool) {
 
         self.products = products
+        self.hasDiscount = hasDiscount
         self.theme = settings.theme
         MyAPIClient.sharedClient.baseURLString = self.backendBaseURL
 
@@ -84,7 +87,7 @@ class CheckoutViewController: UIViewController {
         for product in self.products {
             self.total += product.quantity
         }
-        paymentContext.paymentAmount = total * 100
+        paymentContext.paymentAmount = (self.hasDiscount) ? total*100 - 500 : total*100
         paymentContext.paymentCurrency = self.paymentCurrency
 
         self.tableView = UITableView()
@@ -117,6 +120,12 @@ See https://stripe.com/docs/testing.
                                                detail: "Select address")
         } else {
             self.shippingRow = nil
+        }
+        
+        if self.hasDiscount {
+            self.discountRow = CheckoutRowView(title: "Discount", detail: "-$5.00", tappable: false)
+        } else {
+            self.discountRow = CheckoutRowView(title: "Discount", detail: "-$0.00", tappable: false)
         }
         self.totalRow = CheckoutRowView(title: "Total", detail: "", tappable: false)
         self.buyButton = BuyButton(enabled: false, title: "Confirm")
@@ -174,7 +183,7 @@ See https://stripe.com/docs/testing.
         let spacerView = UIView()
         spacerView.translatesAutoresizingMaskIntoConstraints = false
         spacerView.heightAnchor.constraint(equalToConstant: BuyButton.defaultHeight + 8).isActive = true
-        let footerContainerView = UIStackView(arrangedSubviews: [shippingRow, makeSeparatorView(), paymentRow, makeSeparatorView(), totalRow, spacerView].compactMap({ $0 }))
+        let footerContainerView = UIStackView(arrangedSubviews: [shippingRow, makeSeparatorView(), paymentRow, makeSeparatorView(), discountRow, makeSeparatorView(), totalRow, spacerView].compactMap({ $0 }))
         footerContainerView.axis = .vertical
         footerContainerView.frame = CGRect(x: 0, y: 0, width: 0, height: footerContainerView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height)
 

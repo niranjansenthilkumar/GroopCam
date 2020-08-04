@@ -4,7 +4,7 @@ import Firebase
 import PassKit
 import MessageUI
 
-class PrintQuantityController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ItemCellDelegate, MFMailComposeViewControllerDelegate {
+class PrintQuantityController: UICollectionViewController, UICollectionViewDelegateFlowLayout, ItemCellDelegate {
         
     var objects = [QuantityObject]()
                 
@@ -57,7 +57,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     }()
     
     var hasDiscountCode = false
-    var discountValue = 0
     
     
     override func viewDidLoad() {
@@ -148,6 +147,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     
     @objc func handleApply() {
         guard let discountCode = self.discountField.text else { return }
+        self.discountField.resignFirstResponder()
         if Auth.auth().currentUser != nil {
             self.showSpinner(onView: self.checkoutView)
             Database.database().reference().child("discounts").observeSingleEvent(of: .value, with: {(snapshot) in
@@ -160,20 +160,16 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
                 let discounts = Array(discountsDictionary.keys)
                 for discount in discounts {
                     if discountCode == discount {
-                        self.discountValue = discountsDictionary[discount]!
-                        if self.total < 5 {
-                            self.presentFailedCheckout()
-                        }
-                        if self.discountValue < self.total {
-                            self.presentAlert("This code doesn't have enough amount of free photos!")
-                            return
-                        } else if self.discountValue == self.total {
-                            self.removeDiscountCode(discount)
+                        let discountValue = discountsDictionary[discount]!
+                        if discountValue >= 5 {
+                            self.updateDiscountValue(discount, discountValue - 5)
+                            self.hasDiscountCode = true
+                            self.totalLabel.text = "Total: $" + String(self.total - 5) + ".00"
+                            self.presentAlert("Successfully applied discount code!")
                         } else {
-                            self.updateDiscountValue(discount, self.discountValue - self.total)
+                            self.removeDiscountCode(discountCode)
+                            self.presentAlert("This code doesn't have enough amount of free photos!")
                         }
-                        self.hasDiscountCode = true
-                        self.presentAlert("Successfully applied discount code!")
                         return
                     }
                 }
@@ -190,22 +186,6 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         Database.database().reference().child("discounts").child(discountCode).setValue(amount)
     }
     
-    func sendEmail(_ desc: String) {
-        let composeVC = MFMailComposeViewController()
-        composeVC.mailComposeDelegate = self
-        // Configure the fields of the interface.
-        composeVC.setToRecipients([])
-        composeVC.setSubject("GroopCam -")
-        composeVC.setMessageBody(desc, isHTML: false)
-        // Present the view controller modally.
-        self.present(composeVC, animated: true, completion: nil)
-    }
-    
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        self.hasDiscountCode = false
-        controller.dismiss(animated: true)
-    }
-    
     let SupportedPaymentNetworks = [PKPaymentNetwork.visa, PKPaymentNetwork.masterCard, PKPaymentNetwork.amex]
     let ApplePaySwagMerchantID = "merchant.groopcam"
     var shiptot: NSDecimalNumber = 0.0
@@ -215,19 +195,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         checkoutButton.animateButtonDown()
         if total < 5 {
             self.presentFailedCheckout()
-        } else if hasDiscountCode {
-            if !MFMailComposeViewController.canSendMail() {
-                self.presentAlert("Email service is not supported on this device!")
-                return
-            }
-            var desc = ""
-            for object in self.objects{
-                let st = "(" + String(object.quantity) + " , " + object.printableObject.post.imageUrl + "), "
-                desc.append(st)
-            }
-            self.sendEmail(desc)
-        }
-        else{
+        } else{
             self.toggleCheckout()
         }
     }
@@ -264,8 +232,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
             self.proceedApplePay()
         } else {
             let settingsVC = SettingsViewController()
-            let checkoutVC = CheckoutViewController(products: self.objects, settings: settingsVC.settings)
-            checkoutVC.total = self.total
+            let checkoutVC = CheckoutViewController(products: self.objects, settings: settingsVC.settings, hasDiscount: self.hasDiscountCode)
             self.navigationController?.pushNavBarWithTitle(vc: checkoutVC)
             self.navigationItem.leftItemsSupplementBackButton = true
             self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
@@ -276,7 +243,11 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     func proceedApplePay() {
         shiptot = NSDecimalNumber(value: Double(self.total) + 2.50)
         
-        let shippitot = Double(self.total) + 2.50
+        var shippitot = Double(self.total) + 2.50
+        
+        if self.hasDiscountCode {
+            shippitot = Double(self.total) + 2.50 - 5.00
+        }
         
 
         let request = PKPaymentRequest()
@@ -290,6 +261,21 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
             PKPaymentSummaryItem(label: "Shipping", amount: NSDecimalNumber(value: 2.50)),
             PKPaymentSummaryItem(label: "GroopCam", amount: NSDecimalNumber(value: shippitot))
         ]
+        if self.hasDiscountCode {
+            request.paymentSummaryItems = [
+                PKPaymentSummaryItem(label: "GroopCam Photos", amount: NSDecimalNumber(value: self.total)),
+                PKPaymentSummaryItem(label: "Shipping", amount: NSDecimalNumber(value: 2.50)),
+                PKPaymentSummaryItem(label: "Discount", amount: NSDecimalNumber(value: -5.00)),
+                PKPaymentSummaryItem(label: "GroopCam", amount: NSDecimalNumber(value: shippitot))
+            ]
+        } else {
+            request.paymentSummaryItems = [
+                PKPaymentSummaryItem(label: "GroopCam Photos", amount: NSDecimalNumber(value: self.total)),
+                PKPaymentSummaryItem(label: "Shipping", amount: NSDecimalNumber(value: 2.50)),
+                PKPaymentSummaryItem(label: "Discount", amount: NSDecimalNumber(value: -0.00)),
+                PKPaymentSummaryItem(label: "GroopCam", amount: NSDecimalNumber(value: shippitot))
+            ]
+        }
 
 //            var address = PKAddressField()
 //            address.insert(.postalAddress)
@@ -515,105 +501,109 @@ extension PrintQuantityController: PKPaymentAuthorizationViewControllerDelegate 
         print(256)
     
         // 3
-        STPAPIClient.shared().createToken(with: payment) {
-          (token, error) -> Void in
+        STPAPIClient.shared().createToken(with: payment) {(token, error) -> Void in
+            if (error != nil) {
+                print(error ?? "Error")
+//                completion(PKPaymentAuthorizationStatus.failure)
+                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
+                return
+            }
     
-        if (error != nil) {
-            print(error ?? "Error")
-//            completion(PKPaymentAuthorizationStatus.failure)
-            completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
-            return
-        }
-    
-          // 4
-        let shippingAddress = self.createShippingAddressFromRef(address: payment.shippingContact!)
+            // 4
+            let shippingAddress = self.createShippingAddressFromRef(address: payment.shippingContact!)
             
-        let billingAddress = self.createShippingAddressFromRef(address: payment.billingContact!)
+            let billingAddress = self.createShippingAddressFromRef(address: payment.billingContact!)
                 
-        print(billingAddress, 256)
+            print(billingAddress, 256)
         
-        let emailAddress = payment.shippingContact?.emailAddress!
+            let emailAddress = payment.shippingContact?.emailAddress!
             
-          // 5
-//        let url = NSURL(string: "https://groopcamios.herokuapp.com/pay")
-        let url = NSURL(string: "https://groopcamstripe2.herokuapp.com/pay")
-//        let url = NSURL(string: "http://127.0.0.1:5000/pay")  // Replace with computers local IP Address!
-        let request = NSMutableURLRequest(url: url! as URL)
-          request.httpMethod = "POST"
-          request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-          request.setValue("application/json", forHTTPHeaderField: "Accept")
+            // 5
+          let url = NSURL(string: "https://groopcamios.herokuapp.com/pay")
+//            let url = NSURL(string: "https://groopcamstripe2.herokuapp.com/pay")
+//          let url = NSURL(string: "http://127.0.0.1:5000/pay")  // Replace with computers local IP Address!
+            let request = NSMutableURLRequest(url: url! as URL)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json", forHTTPHeaderField: "Accept")
             
-          // 6
-        let tot = self.total * 100
-        let shipping_tot = 250
-        let final_tot = tot + shipping_tot
+            // 6
+            let tot = self.total * 100
+            let shipping_tot = 250
+            var final_tot = 0
+            if self.hasDiscountCode {
+                final_tot = tot + shipping_tot - 500
+            } else {
+                final_tot = tot + shipping_tot
+            }
 
-        var desc = ""
-        for object in self.objects{
-            let st = "(" + String(object.quantity) + " , " + object.printableObject.post.imageUrl + "), "
-            desc.append(st)
-        }
+            var desc = ""
+            for object in self.objects{
+                let st = "(" + String(object.quantity) + " , " + object.printableObject.post.imageUrl + "), "
+                desc.append(st)
+            }
             
         
                         
-        let final_name = shippingAddress.FirstName! + " " + shippingAddress.LastName!
+            let final_name = shippingAddress.FirstName! + " " + shippingAddress.LastName!
             
-        let shipping = [
-            "name": final_name,
-            "address": [
-                "line1": shippingAddress.Street!,
-                "city": shippingAddress.City!,
-                "country": "US",
-                "postal_code": shippingAddress.Zip]
-        ] as [String : Any]
+            let shipping = [
+                "name": final_name,
+                "address": [
+                    "line1": shippingAddress.Street!,
+                    "city": shippingAddress.City!,
+                    "country": "US",
+                    "postal_code": shippingAddress.Zip]
+                ] as [String : Any]
             
-        let body = [
-            "stripeToken": token!.tokenId,
-            "amount": final_tot,
-            "description": emailAddress! + " " + desc,
-            "email": emailAddress!,
-            "shippingActual": shipping
-            ] as [String : Any]
+            let body = [
+                "stripeToken": token!.tokenId,
+                "amount": final_tot,
+                "description": emailAddress! + " " + desc,
+                "email": emailAddress!,
+                "shippingActual": shipping
+                ] as [String : Any]
     
-        print(body, 123)
+            print(body, 123)
             
 //          var error: NSError?
-    //        request.HTTPBody = JSONSerialization.dataWithJSONObject(body, options: JSONSerialization.WritingOptions(), error: &error)
+            
+//          request.HTTPBody = JSONSerialization.dataWithJSONObject(body, options: JSONSerialization.WritingOptions(), error: &error)
+//          request.httpBody = JSONSerialization.datawith
     
-    //        request.httpBody = JSONSerialization.datawith
-    
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: JSONSerialization.WritingOptions())
-        }
-        catch{
-            print("Caught error:", error)
-        }
-    
-          // 7
-        URLSession.shared.dataTask(with: request as URLRequest, completionHandler: {data, respnse, error -> Void in
-            if (error != nil) {
-                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
-            } else {
-                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: []))
-                self.navigationController?.popToRootViewController(animated: true)
+            do {
+                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: JSONSerialization.WritingOptions())
             }
-        })
+            catch{
+                print("Caught error:", error)
+            }
+    
+            // 7
+            URLSession.shared.dataTask(with: request as URLRequest, completionHandler: {data, respnse, error -> Void in
+                if (error != nil) {
+                    completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
+                } else {
+                    completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: []))
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            })
             
 //            NSURLConnection.sendAsynchronousRequest(request as URLRequest, queue: OperationQueue.main) { (response, data, error) -> Void in
-//            if (error != nil) {
-////                completion(PKPaymentAuthorizationStatus.failure)
-//                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
-//            } else {
-////                completion(PKPaymentAuthorizationStatus.success)
-//                completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: []))
-//                self.navigationController?.popToRootViewController(animated: true)
+//              if (error != nil) {
+////                                        completion(PKPaymentAuthorizationStatus.failure)
+//                  completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.failure, errors: []))
+//              } else {
+////                                         completion(PKPaymentAuthorizationStatus.success)
+//                  completion(PKPaymentAuthorizationResult(status: PKPaymentAuthorizationStatus.success, errors: []))
+//                  self.navigationController?.popToRootViewController(animated: true)
+//              }
 //            }
-//          }
             
         }
     }
     
     func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
+        self.hasDiscountCode = false
         controller.dismiss(animated: true, completion: nil)
     }
     
