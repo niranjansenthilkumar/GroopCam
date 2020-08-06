@@ -39,7 +39,7 @@ class MyAPIClient: NSObject, STPCustomerEphemeralKeyProvider {
             desc.append(st)
         }
         if let shippingAddress = shippingAddress {
-            params["description"] = shippingAddress.email! + " " + desc
+            params["description"] = shippingAddress.email ?? "" + " " + desc
         }
 //        params["products"] = products.map({ (p) -> String in
 //            return p.printableObject.post.imageUrl
@@ -62,7 +62,7 @@ class MyAPIClient: NSObject, STPCustomerEphemeralKeyProvider {
                     completion(.failure(error ?? APIError.unknown))
                     return
             }
-            completion(.success(secret))
+            completion(.success(secret.replacingOccurrences(of: "\"", with: "")))
         })
         task.resume()
     }

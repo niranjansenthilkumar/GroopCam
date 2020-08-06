@@ -1,3 +1,5 @@
+
+
 import UIKit
 import Stripe
 import Firebase
@@ -58,6 +60,17 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     
     var hasDiscountCode = false
     
+    var topbarHeight: CGFloat {
+        if #available(iOS 13.0, *) {
+            return (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) +
+                (self.navigationController?.navigationBar.frame.height ?? 0.0)
+        } else {
+            // Fallback on earlier versions
+            return UIApplication.shared.statusBarFrame.size.height +
+            (self.navigationController?.navigationBar.frame.height ?? 0.0)
+        }
+    }
+    
     
     override func viewDidLoad() {
         
@@ -92,9 +105,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
     }
     
     @objc func keyboardWillHide(_ notification: Notification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            self.view.frame.origin.y += keyboardSize.height
-        }
+        self.view.frame.origin.y = topbarHeight
     }
     
     func didIncrease(for cell: ItemCell) {
@@ -114,7 +125,11 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
         self.total += 1
         
-        self.totalLabel.text = "Total: $" + String(self.total) + ".00"
+        if self.hasDiscountCode {
+            self.totalLabel.text = "Total: $" + String(self.total-5) + ".00"
+        } else {
+            self.totalLabel.text = "Total: $" + String(self.total) + ".00"
+        }
     }
 
     func didDecrease(for cell: ItemCell) {
@@ -141,7 +156,11 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
         
         total = quantity
         
-        self.totalLabel.text = "Total: $" + String(self.total) + ".00"
+        if self.hasDiscountCode {
+            self.totalLabel.text = "Total: $" + String(self.total-5) + ".00"
+        } else {
+            self.totalLabel.text = "Total: $" + String(self.total) + ".00"
+        }
 
     }
     
@@ -164,7 +183,7 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
                         if discountValue >= 5 {
                             self.updateDiscountValue(discount, discountValue - 5)
                             self.hasDiscountCode = true
-                            self.totalLabel.text = "Total: $" + String(self.total - 5) + ".00"
+                            self.totalLabel.text = "Total: $" + String(self.total-5) + ".00"
                             self.presentAlert("Successfully applied discount code!")
                         } else {
                             self.removeDiscountCode(discountCode)
@@ -206,10 +225,8 @@ class PrintQuantityController: UICollectionViewController, UICollectionViewDeleg
 //        alert.addAction(UIAlertAction(title: "Manual Checkout", style: .default , handler:{ (UIAlertAction)in
 //            print("User clicked manual checkout")
 //            let settingsVC = SettingsViewController()
-//            let checkoutVC = CheckoutViewController(products: self.objects, settings: settingsVC.settings)
-//            checkoutVC.total = self.total
+//            let checkoutVC = CheckoutViewController(products: self.objects, settings: settingsVC.settings, hasDiscount: self.hasDiscountCode)
 //            self.navigationController?.pushNavBarWithTitle(vc: checkoutVC)
-//
 //            self.navigationItem.leftItemsSupplementBackButton = true
 //            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
 //        }))
@@ -495,9 +512,8 @@ extension PrintQuantityController: PKPaymentAuthorizationViewControllerDelegate 
         // 2
 //        Stripe.setDefaultPublishableKey("pk_test_51H7kEVGsV27pOa0Ot4JccQx1EEN39C4yg1wgtVxbh3ixZUSvmx8glp0kccsQSID5I1XCvE14ZLe4XYNHtviXd3vf00pVICEpCv")
 //        Stripe.setDefaultPublishableKey("pk_test_pUrttWCwYjM0Ge3VzWJhT9v800pwbF49Ik")  // Replace With Your Own Key!
-        
-        Stripe.setDefaultPublishableKey("pk_live_b1pjET7QOxe5hVHCABXX5oZx00k8hUVqEo")  // Replace With Your Own Key!
-            
+//        Stripe.setDefaultPublishableKey("pk_live_b1pjET7QOxe5hVHCABXX5oZx00k8hUVqEo")  // Replace With Your Own Key!
+        STPAPIClient.shared().publishableKey = "pk_test_pUrttWCwYjM0Ge3VzWJhT9v800pwbF49Ik"
         print(256)
     
         // 3
@@ -603,7 +619,6 @@ extension PrintQuantityController: PKPaymentAuthorizationViewControllerDelegate 
     }
     
     func paymentAuthorizationViewControllerDidFinish(_ controller: PKPaymentAuthorizationViewController) {
-        self.hasDiscountCode = false
         controller.dismiss(animated: true, completion: nil)
     }
     
