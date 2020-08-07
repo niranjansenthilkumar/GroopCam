@@ -63,13 +63,12 @@ class VerificationCodeController: UIViewController {
         
         if let user = Auth.auth().currentUser {
             user.link(with: credential) { (user, error) in
+                UserDefaults.standard.set(user?.user.uid, forKey: "userid")
+                UserDefaults.standard.synchronize()
                 let usernameVC = UsernameController()
                 usernameVC.phoneNumber = self.phoneNumber
                 self.navigationController?.pushNavBar(vc: usernameVC)
                 self.navigationItem.setBackImageEmpty()
-                
-                UserDefaults.standard.set(user?.user.uid, forKey: "userid")
-                UserDefaults.standard.synchronize()
             }
         }
         

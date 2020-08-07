@@ -15,6 +15,7 @@ import Contacts
 class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
     
     var groupId: String = ""
+    var groupName: String = ""
     var contactsToNotAdd: [String] = []
 
         
@@ -305,6 +306,7 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
                     print("Successfully saved group members to db")
             }
             
+            guard let username = UserDefaults.standard.string(forKey: "username") else {return}
             
             var uidsToUpdate: [String] = []
             
@@ -327,7 +329,17 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
                     }
                 }
             }
-            
+            Database.database().reference().child("users").child(currentuid).child("token").observeSingleEvent(of: .value) {(snapshot) in
+                if let value = snapshot.value as? String {
+                    let sender = PushNotificationSender()
+                    if uidsToUpdate.count == 1 {
+                        sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\".")
+                    } else {
+                        sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\" with \(uidsToUpdate.count - 1) others.")
+                    }
+                    
+                }
+            }
 
             self.navigationController?.popToRootViewController(animated: true)
 //            self.navigationController?.popViewController(animated: true)

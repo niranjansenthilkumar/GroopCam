@@ -126,6 +126,7 @@ class FriendsController: UITableViewController, UIActionSheetDelegate {
         updateFriendsVC.contactsToNotAdd = self.contactsToNotAdd
         print(self.contactsToNotAdd, "pleasee")
         updateFriendsVC.groupId = self.group?.groupid ?? ""
+        updateFriendsVC.groupName = self.group?.groupname ?? ""
         self.navigationController?.pushNavBarWithTitle(vc: updateFriendsVC)
         self.navigationItem.setBackImageEmpty()
     }
