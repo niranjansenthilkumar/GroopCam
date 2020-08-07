@@ -328,16 +328,16 @@ class UpdateFriendsController: UITableViewController, UISearchResultsUpdating {
                         print("Successfully appended group to user")
                     }
                 }
-            }
-            Database.database().reference().child("users").child(currentuid).child("token").observeSingleEvent(of: .value) {(snapshot) in
-                if let value = snapshot.value as? String {
-                    let sender = PushNotificationSender()
-                    if uidsToUpdate.count == 1 {
-                        sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\".")
-                    } else {
-                        sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\" with \(uidsToUpdate.count - 1) others.")
+                Database.database().reference().child("users").child(currentuid).child("token").observeSingleEvent(of: .value) {(snapshot) in
+                    if let value = snapshot.value as? String {
+                        let sender = PushNotificationSender()
+                        if uidsToUpdate.count == 1 {
+                            sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\".")
+                        } else {
+                            sender.sendPushNotification(to: value, body: "@\(username) added you to album \"\(self.groupName)\" with \(uidsToUpdate.count - 1) others.")
+                        }
+                        
                     }
-                    
                 }
             }
 
